@@ -1,6 +1,6 @@
-# paradaya-news
+ParadayaNews :: The Vue Chronicles  
 
-This template should help get you started developing with Vue 3 in Vite.
+This template is your gateway to building awesomeness with Vue 3 + Vite.  
 
 ## Recommended IDE Setup
 
