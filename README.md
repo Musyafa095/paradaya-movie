@@ -1,4 +1,4 @@
-ParadayaNews :: The Vue Chronicles  
+# ParadayaNews :: The Vue Chronicles  
 
 This template is your gateway to building awesomeness with Vue 3 + Vite.  
 
