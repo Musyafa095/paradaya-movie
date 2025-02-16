@@ -1,7 +1,7 @@
 <template>
   <DefaultLayout>
     <div>
-    <div class="flex overflow-x-auto whitespace-nowrap bg-gradient-to-r from-red-600 via-purple-800 to-blue-600 p-2.5  scrollbar-hide gap-2.5">
+    <div class="flex overflow-x-auto whitespace-nowrap bg-gradient-to-r from-red-600 via-purple-800 to-blue-600 p-2.5  scrollbar-hide gap-2.5 capitalize font-roboto font-bold">
       <RouterLink
         v-for="item in category.category"
         :key="item.id"
