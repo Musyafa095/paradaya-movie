@@ -1,26 +1,50 @@
 <template>
   <DefaultLayout>
-    <div>
-    <div class="flex overflow-x-auto whitespace-nowrap bg-gradient-to-r from-red-600 via-purple-800 to-blue-600 p-2.5  scrollbar-hide gap-2.5 capitalize font-roboto font-bold">
-      <RouterLink
+    <!-- Category Navigation -->
+    <div class="flex overflow-x-auto whitespace-nowrap bg-gradient-to-r from-red-600 via-purple-800 to-blue-600 p-2.5 scrollbar-hide gap-2.5">
+      <button
+        @click="currentCategory = null"
+        :class="[
+          'flex-none px-4 py-2 text-white font-bold rounded transition-colors',
+          !currentCategory ? 'bg-white/20' : 'hover:bg-white/10'
+        ]"
+      >
+        Semua
+      </button>
+      <button
         v-for="item in category.category"
         :key="item.id"
-        :to="`/category/${item.id}`"
-        class="flex-none px-4 py-2 text-white font-bold rounded hover:bg-white/10 transition-colors"
+        @click="currentCategory = item.id"
+        :class="[
+          'flex-none px-4 py-2 text-white font-bold rounded transition-colors',
+          currentCategory === item.id ? 'bg-white/20' : 'hover:bg-white/10'
+        ]"
       >
         {{ item.name }}
-      </RouterLink>
+      </button>
     </div>
-  </div>
-  <div class="container mx-auto px-4 md:px-6 lg:px-8 py-8">
-  <h1 class="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-gray-800 to-gray-500 bg-clip-text text-transparent">
-    Recommended for you
-  </h1>
-  
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-    <CardProduct :dataProps="filteredNews" />
-  </div>
-</div>
+    
+    <div class="container mx-auto px-4 md:px-6 lg:px-8 py-8">
+      <h1 class="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-gray-800 to-gray-500 bg-clip-text text-transparent">
+        {{ currentCategory ? `Berita ${getCategoryName}` : 'Semua Berita' }}
+      </h1>
+      
+      <!-- Loading state -->
+      <div v-if="isLoading" class="flex justify-center items-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+      
+      <!-- Error state -->
+      <div v-else-if="error" class="text-red-600 text-center py-8">
+        {{ error }}
+        <button @click="fetchNews" class="btn btn-primary mt-4">Coba Lagi</button>
+      </div>
+      
+      <!-- News grid -->
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <CardNews :dataProps="filteredNews" />
+      </div>
+    </div>
   </DefaultLayout>
 </template>
 
@@ -28,49 +52,41 @@
 import { onMounted, ref, computed } from "vue";
 import { useCategoryStore } from "@/stores/category";
 import { useNewsStore } from "@/stores/news";
-import { useSearchStore } from "@/stores/search";
 import DefaultLayout from "@/layouts/Default.vue";
-
+import CardNews from "@/components/CardNews.vue";
 
 const category = useCategoryStore();
 const news = useNewsStore();
 const isLoading = ref(true);
-const  searchStore = useSearchStore();
+const error = ref(null);
+const currentCategory = ref(null);
 
-const handleGetCategory = async () => {
-  try {
-    const res = await category.getCategory();
-    console.log(res);
-  } catch (error) {
-    console.log(error);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-const handleGetNews = async () => {
-  try {
-    const res = await news.getNews();
-    console.log(res);
-  } catch (error) {
-    console.log(error);
-  } finally {
-    isLoading.value = false;
-  }
-};
+const getCategoryName = computed(() => {
+  if (!currentCategory.value) return '';
+  const found = category.category.find(cat => cat.id === currentCategory.value);
+  return found ? found.name : '';
+});
 
 const filteredNews = computed(() => {
-  if (!searchStore.searchQuery.value) {
-    return news.news;
+  if (!currentCategory.value) return news.news;
+  return news.news.filter(item => item.category_id === currentCategory.value);
+});
+
+const fetchNews = async () => {
+  error.value = null;
+  isLoading.value = true;
+  try {
+    await Promise.all([
+      category.getCategory(),
+      news.getNews()
+    ]);
+  } catch (err) {
+    error.value = "Gagal memuat data";
+    console.error(err);
+  } finally {
+    isLoading.value = false;
   }
-  return news.news.filter((p) =>
-    p.name.toLowerCase().includes(searchStore.searchQuery.toLowerCase())
-  );
-});
+};
 
-onMounted(() => {
-  handleGetCategory();
-  handleGetNews();
-});
+onMounted(fetchNews);
 </script>
-

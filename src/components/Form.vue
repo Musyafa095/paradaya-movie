@@ -4,7 +4,7 @@
     @submit.prevent="onSubmit"
   >
    <!-- Alert Component -->
-   <div v-if="auth.showAlert" role="alert" class="alert alert-success mb-6 p-4 flex items-center gap-2 bg-green-100 text-green-700 rounded-lg">
+   <div v-if="auth.showAlert" role="alert" class="alert alert-success mb-6 p-4 flex items-center gap-2 bg-black text-blue-600 rounded-lg shadow-lg">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         class="h-6 w-6 shrink-0 stroke-current"

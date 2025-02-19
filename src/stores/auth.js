@@ -1,35 +1,26 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-
-import { apiClient } from "@/config/api";
 import { useRouter } from "vue-router";
+import { apiClient } from "@/config/api";
 
 export const authStore = defineStore("auth", () => {
   const router = useRouter();
-  const token = ref(
-    localStorage.getItem("token") ? localStorage.getItem("token") : null
-  );
-  const currentUser = ref(
-    localStorage.getItem("user")
-      ? JSON.parse(localStorage.getItem("user"))
-      : null
-  );
-  const profile = ref(
-    localStorage.getItem("profile")
-      ? JSON.parse(localStorage.getItem("profile"))
-      : null
-  );
-  
+
+  const token = ref(localStorage.getItem("token") || null);
+  const currentUser = ref(localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null);
+  const profile = ref(localStorage.getItem("profile") ? JSON.parse(localStorage.getItem("profile")) : null);
+
+  // State untuk alert notification
   const showAlert = ref(false);
   const alertMessage = ref("");
 
-  function showNotification(message, duration = 5000) {
+  function showNotification(message) {
     alertMessage.value = message;
     showAlert.value = true;
     
     setTimeout(() => {
       showAlert.value = false;
-    }, duration);
+    }, 5000);
   }
 
   async function register({ name, email, password, password_confirmation }) {
@@ -40,116 +31,77 @@ export const authStore = defineStore("auth", () => {
         password,
         password_confirmation,
       });
-      showNotification("User berhasil register, silahkan login & cek email anda");
+
+      showNotification(data.message);
       router.replace("/login");
     } catch (error) {
-      if (error.response) {
-        if (error.response.status === 422) {
-          const errors = error.response.data.errors;
-          let errorMessage = '';
-          
-          Object.values(errors).forEach(messages => {
-            errorMessage += messages.join(', ') + '\n';
-          });
-          
-          showNotification(errorMessage.trim());
-        } else {
-          showNotification(error.response.data.message || "Terjadi kesalahan");
-        }
-      } else if (error.request) {
-        showNotification("Tidak dapat terhubung ke server");
-      } else {
-        showNotification("Terjadi kesalahan");
-      }
-      console.error('Error detail:', error);
+      console.error(error.message);
+      showNotification("Pendaftaran gagal, silakan coba lagi.");
     }
   }
 
   async function login({ email, password }) {
     try {
       const { data } = await apiClient.post("/auth/login", { email, password });
+
       token.value = data.token;
       currentUser.value = data.user;
+
       localStorage.setItem("token", token.value);
       localStorage.setItem("user", JSON.stringify(currentUser.value));
-      showNotification("Berhasil Login");
-      console.log("Status verifikasi:", data.user.email_verified_at);
-  
-      if (data.user.role.name === "admin") {
+
+
+      if (currentUser.value?.role?.name === "admin"){
+        showNotification("Berhasil login sebagai admin");
         router.replace("/");
-      } else if (data.user.role.name === "user") {
-        if (data.user.email_verified_at) {
-          router.replace("/");
-        } else {
-          router.replace("/verify-account");
-        }
+      } else if (currentUser.value?.is_verified) {
+        showNotification("Selamat anda berhasil Login");
+        router.replace("/");
       } else {
-        showNotification("Role tidak valid");
+        showNotification("Silakan verifikasi email Anda terlebih dahulu");
+        router.replace("/verify-account");
       }
     } catch (error) {
-      if (error.response) {
-        // Error dari server dengan status code
-        if (error.response.status === 422) {
-          // Validation error (misalnya, email atau password salah)
-          const errors = error.response.data.errors;
-          let errorMessage = '';
-  
-          // Gabungkan semua pesan error
-          Object.values(errors).forEach(messages => {
-            errorMessage += messages.join(', ') + '\n';
-          });
-  
-          showNotification(errorMessage.trim()); // Tampilkan notifikasi error
-        } else if (error.response.status === 401) {
-          // Unauthorized (misalnya, email atau password salah)
-          showNotification(error.response.data.message || "Email atau password salah");
-        } else {
-          // Error lain dari server
-          showNotification(error.response.data.message || "Terjadi kesalahan");
-        }
-      } else if (error.request) {
-        // Error karena tidak ada response dari server
-        showNotification("Tidak dapat terhubung ke server");
-      } else {
-        // Error lainnya
-        showNotification("Terjadi kesalahan");
-      }
-      console.error('Error detail:', error);
+      console.error(error.message);
+      showNotification("Email atau Password salah.");
     }
   }
+
   async function logout() {
     try {
       const { data } = await apiClient.post("/auth/logout", null, {
-        headers: {
-          Authorization: `Bearer ${token.value}`,
-        },
+        headers: { Authorization: `Bearer ${token.value}` },
       });
-  
+
       token.value = null;
       currentUser.value = null;
       profile.value = null;
+
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       localStorage.removeItem("profile");
-  
-      showNotification(data.message || "Anda berhasil logout");
+
+      showNotification(data.message);
       router.replace("/login");
     } catch (error) {
-      showNotification("Gagal logout, coba lagi nanti");
-      console.error("Error detail:", error);
+      console.error(error.message);
+      showNotification("Gagal logout, silakan coba lagi.");
     }
   }
+
   async function getUserLogged() {
     try {
       const { data } = await apiClient.get("/auth/me", {
         headers: { Authorization: `Bearer ${token.value}` },
       });
-  
+
       currentUser.value = data.user;
-      localStorage.setItem("user", JSON.stringify(currentUser.value)); // Simpan data terbaru
+      localStorage.setItem("user", JSON.stringify(data.user));
+
       return data.user;
     } catch (error) {
-      console.error("Gagal mengambil data user:", error);
+      console.error(error.message);
+      showNotification("Gagal mengambil data pengguna.");
     }
   }
 
@@ -158,57 +110,47 @@ export const authStore = defineStore("auth", () => {
       const { data } = await apiClient.post(
         "/auth/account_verification",
         { otp },
-        {
-          headers: {
-            Authorization: `Bearer ${token.value}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token.value}` } }
       );
-  
-      // Perbarui data user setelah verifikasi
+
       await getUserLogged();
-      showNotification("Akun berhasil diverifikasi!");
+
+      showNotification("Selamat Anda berhasil login dan telah terverifikasi.");
       router.replace("/");
     } catch (error) {
-      if (error.response?.status === 422) {
-        showNotification("Kode OTP salah atau sudah kadaluarsa");
-      } else {
-        showNotification("Gagal verifikasi akun");
-      }
-      console.error("Error detail:", error);
+      console.error(error.message);
+      showNotification("Kode OTP salah atau sudah kadaluarsa.");
     }
   }
+
   async function generateOtp(email) {
     try {
       const { data } = await apiClient.post(
         "/auth/generate_otp_code",
         { email },
-        {
-          headers: {
-            Authorization: `Bearer ${token.value}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token.value}` } }
       );
 
-      const successMessage = data.message;
-      showNotification(successMessage); 
+      showNotification(data.message);
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message);
+      showNotification("Gagal mengirim ulang kode OTP.");
     }
   }
 
   async function uploadProfile(payload) {
     try {
-      const { data } = await apiClient.post("/profile", payload, {
-        headers: {
-          Authorization: `Bearer ${token.value}`,
-        },
+      const { data } = await apiClient.post("/auth/profile", payload, {
+        headers: { Authorization: `Bearer ${token.value}` },
       });
+
       profile.value = data.user;
       localStorage.setItem("profile", JSON.stringify(profile.value));
+
       console.log(data);
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      showNotification("Gagal mengupdate profil.");
     }
   }
 
@@ -223,6 +165,7 @@ export const authStore = defineStore("auth", () => {
     generateOtp,
     uploadProfile,
     showAlert,
-    alertMessage
+    alertMessage,
+    showNotification,
   };
 });
