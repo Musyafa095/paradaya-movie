@@ -1,9 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Profile from "@/views/Profile.vue";
-import DetailNews from "@/views/DetailNews.vue";
-import Dashboard from "@/views/Admin/Dashboard.vue";
-import Login from "@/views/Login.vue";
-import Register from "@/views/Register.vue";
 import { authStore } from "@/stores/auth";
 
 const routes = [
@@ -13,47 +8,67 @@ const routes = [
     name: "Home",
     meta: {
       layout: 'Default',
-      requiresVerification: true,
-    },
-  },
-  {
-    path: "/profile/:id",
-    component: Profile,
-    meta: {
-      layout: "Default",
-      isAuth: true, 
-    },
-  },
-  {
-    path: "/news/:id",
-    component: DetailNews,
-    meta: {
-      layout: "Default",
+      requiresAuth: true // Tambahkan ini untuk halaman yang memerlukan login
     },
   },
   {
     path: "/dashboard",
-    component: Dashboard,
+    component: () => import("@/views/Admin/Dashboard.vue"),
+    name: "Dashboard",
     meta: {
-      layout: "Dashboard",
-      isAuth: true, 
-      isAdmin: true, 
+      requiresAuth: true,
+      isAdmin: true
+    },
+    children: [
+      {
+        path: "news",
+        name: "News",
+        component: () => import("@/components/Admin/News.vue"),
+      },
+      {
+        path: "category",
+        name: "Category",
+        component: () => import("@/components/Admin/Category.vue"),
+      }
+    ]
+  },
+  {
+    path: "/profile/:id",
+    component: () => import("@/views/Profile.vue"),
+    meta: {
+      layout: "Default",
+      requiresAuth: true
+    },
+  },
+  {
+    path: "/news/:id",
+    component: () => import("@/views/DetailNews.vue"),
+    meta: {
+      layout: "Default",
+      requiresAuth: true
     },
   },
   {
     path: "/login",
-    component: Login,
+    component: () => import("@/views/Login.vue"),
+    meta: {
+      guestOnly: true // Hanya bisa diakses oleh pengguna belum login
+    },
   },
   {
     path: "/register",
-    component: Register,
+    component: () => import("@/views/Register.vue"),
+    meta: {
+      guestOnly: true
+    },
   },
   {
     path: "/verify-account",
     name: "VerifyAccount",
     component: () => import("@/views/VerifyAccount.vue"),
     meta: {
-      isAuth: true, // Hanya bisa diakses oleh pengguna yang sudah login
+      requiresAuth: true, // Hanya bisa diakses jika sudah login
+      requiresUnverified: true // Hanya bisa diakses jika belum verifikasi
     },
   },
 ];
@@ -66,25 +81,46 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const store = authStore();
 
-  // Jika route memerlukan autentikasi dan pengguna belum login
-  if (to.meta.isAuth && !store.token) {
-    showNotification("Anda harus login terlebih dahulu");
-    return next("/login");
+  // Jika mengakses halaman yang membutuhkan auth
+  if (to.meta.isAuth) {
+    if (!store.token) {
+      store.showNotification("Anda harus login terlebih dahulu");
+      return next("/login");
+    }
   }
 
-  // Jika pengguna sudah login tetapi mencoba mengakses halaman login/register
-  if ((to.path === "/login" || to.path === "/register") && store.token) {
-    showNotification("Anda sudah login");
+  // **Pastikan hanya user yang perlu verifikasi email**
+  if (store.token && store.currentUser) {
+    if (
+      store.currentUser.role.name === "user" &&  
+      !store.currentUser.email_verified_at && 
+      to.path !== "/verify-account"
+    ) {
+      store.showNotification("Silakan verifikasi email Anda terlebih dahulu");
+      return next("/verify-account");
+    }
+  }
+  
+
+  // Jika user sudah verifikasi tetapi mencoba mengakses halaman verifikasi
+  if (store.token && store.currentUser?.email_verified_at && to.path === "/verify-account") {
+    store.showNotification("Anda berhasil login dan  sudah terverifikasi");
     return next("/");
   }
 
-  // Jika route memerlukan akses admin dan pengguna bukan admin
-  if (to.meta.isAdmin && store.currentUser?.role?.name !== "admin") {
-    showNotification("Anda bukan admin");
-    return next("/");
+  // **Khusus untuk halaman admin**
+  if (to.meta.isAdmin) {
+    if (!store.token) {
+      store.showNotification("Anda harus login terlebih dahulu");
+      return next("/login");
+    }
+    if (store.currentUser?.role?.name !== "admin") {
+      store.showNotification("Anda bukan admin");
+      return next("/");
+    }
   }
 
-  // Lanjutkan navigasi
   next();
 });
+  
 export default router;

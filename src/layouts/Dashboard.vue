@@ -5,7 +5,8 @@
       <Navbar />
 
       <main class="flex-grow p-4 bg-gray-100">
-        <slot />
+    <router-view/>
+        <AlertNotification />
       </main>
     </div>
   </section>
@@ -14,4 +15,5 @@
 <script setup>
 import Sidebar from "@/components/Admin/Sidebar.vue";
 import Navbar from "@/components/Admin/Navbar.vue";
+import AlertNotification from "@/components/AlertNotification.vue";
 </script>
