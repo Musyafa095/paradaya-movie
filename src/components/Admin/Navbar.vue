@@ -70,20 +70,15 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { useSearchStore } from '@/stores/search';
 import { useThemeStore } from '@/stores/themeStore';
 import { authStore } from '@/stores/auth';
 
 const auth = authStore()
 const user = auth.currentUser;
 const ThemeStore = useThemeStore();
-const searchStore = useSearchStore();
 const isMobileSearchOpen = ref(false);
 const isProfileDropdownOpen = ref(false);
 
-const toggleSearch = () => {
-  isMobileSearchOpen.value = !isMobileSearchOpen.value;
-};
 const toggleProfileDropdown = () => {
   isProfileDropdownOpen.value = !isProfileDropdownOpen.value;
 };

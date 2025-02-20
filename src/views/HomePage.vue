@@ -25,7 +25,7 @@
     </div>
     
     <div class="container mx-auto px-4 md:px-6 lg:px-8 py-8">
-      <h1 class="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-gray-800 to-gray-500 bg-clip-text text-transparent">
+      <h1 class="text-2xl md:text-4xl font-bold mb-6 light:text-gray-900 text-center font-montserrat">
         {{ currentCategory ? `Berita ${getCategoryName}` : 'Semua Berita' }}
       </h1>
       
@@ -49,28 +49,54 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { useCategoryStore } from "@/stores/category";
 import { useNewsStore } from "@/stores/news";
+import { useSearchStore } from "@/stores/search";
 import DefaultLayout from "@/layouts/Default.vue";
 import CardNews from "@/components/CardNews.vue";
 
 const category = useCategoryStore();
+const searchStore = useSearchStore();
+const router = useRouter();
+const route = useRoute()
 const news = useNewsStore();
 const isLoading = ref(true);
 const error = ref(null);
 const currentCategory = ref(null);
 
 const getCategoryName = computed(() => {
-  if (!currentCategory.value) return '';
-  const found = category.category.find(cat => cat.id === currentCategory.value);
-  return found ? found.name : '';
+  if (!currentCategory.value) return "";
+  const found = category.category.find((cat) => cat.id === currentCategory.value);
+  return found ? found.name : "";
 });
 
+// Cek apakah ada query pencarian
 const filteredNews = computed(() => {
+  if (searchStore.searchQuery) {
+    return news.news.filter((item) =>
+      item.title.toLowerCase().includes(route.query.search.toLowerCase())
+    );
+  }
   if (!currentCategory.value) return news.news;
-  return news.news.filter(item => item.category_id === currentCategory.value);
+  return news.news.filter((item) => item.category_id === currentCategory.value);
 });
+watch(
+  () => searchStore.searchQuery,
+  (newQuery) => {
+    router.replace({ query: { search: newQuery || undefined } });
+  }
+);
+
+// Saat halaman pertama kali dibuka, ambil search dari URL
+watch(
+  () => route.query.search,
+  (newQuery) => {
+    searchStore.searchQuery = newQuery || "";
+  },
+  { immediate: true }
+);
 
 const fetchNews = async () => {
   error.value = null;

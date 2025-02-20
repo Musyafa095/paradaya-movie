@@ -8,30 +8,40 @@ const routes = [
     name: "Home",
     meta: {
       layout: 'Default',
-      requiresAuth: true // Tambahkan ini untuk halaman yang memerlukan login
+      requiresAuth: true
     },
   },
   {
     path: "/dashboard",
-    component: () => import("@/views/Admin/Dashboard.vue"),
+    component: () => import("@/layouts/Dashboard.vue"),
     name: "Dashboard",
     meta: {
       requiresAuth: true,
-      isAdmin: true
+      requiresAdmin: true,
     },
     children: [
+      {
+        path: "", 
+        name: "HomeDashboard",
+        component: () => import("@/components/Admin/HomeDashboard.vue"),
+      },
       {
         path: "news",
         name: "News",
         component: () => import("@/components/Admin/News.vue"),
-      },
+      },    
       {
         path: "category",
         name: "Category",
         component: () => import("@/components/Admin/Category.vue"),
+      },
+      {
+        path: "faq",
+        name: "Faq",
+        component: () => import("@/components/Admin/Faq.vue"),
       }
     ]
-  },
+  },  
   {
     path: "/profile/:id",
     component: () => import("@/views/Profile.vue"),
@@ -42,17 +52,18 @@ const routes = [
   },
   {
     path: "/news/:id",
-    component: () => import("@/views/DetailNews.vue"),
+    component: () => import("@/views/NewsDetail.vue"),
+    name: "NewsDetail",
     meta: {
       layout: "Default",
-      requiresAuth: true
+      requiresAuth: true,
     },
   },
   {
     path: "/login",
     component: () => import("@/views/Login.vue"),
     meta: {
-      guestOnly: true // Hanya bisa diakses oleh pengguna belum login
+      guestOnly: true 
     },
   },
   {
@@ -78,11 +89,14 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async(to, from, next) => {
   const store = authStore();
 
-  // Jika mengakses halaman yang membutuhkan auth
-  if (to.meta.isAuth) {
+  if (!store.currentUser && store.token) {
+    await store.getUserLogged();
+  }
+
+  if (to.meta.requiresAuth) {
     if (!store.token) {
       store.showNotification("Anda harus login terlebih dahulu");
       return next("/login");
@@ -109,7 +123,7 @@ router.beforeEach((to, from, next) => {
   }
 
   // **Khusus untuk halaman admin**
-  if (to.meta.isAdmin) {
+  if (to.meta.requiresAdmin) {
     if (!store.token) {
       store.showNotification("Anda harus login terlebih dahulu");
       return next("/login");
