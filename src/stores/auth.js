@@ -1,171 +1,211 @@
-import { ref } from "vue";
-import { defineStore } from "pinia";
-import { useRouter } from "vue-router";
-import { apiClient } from "@/config/api";
+  import { ref } from "vue";
+  import { defineStore } from "pinia";
+  import { useRouter } from "vue-router";
+  import { apiClient } from "@/config/api";
 
-export const authStore = defineStore("auth", () => {
-  const router = useRouter();
+  export const authStore = defineStore("auth", () => {
+    const router = useRouter();
+    const token = ref(localStorage.getItem("token") || null);
+    const currentUser = ref(localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null);
+    const profile = ref(localStorage.getItem("profile") ? JSON.parse(localStorage.getItem("profile")) : null);
 
-  const token = ref(localStorage.getItem("token") || null);
-  const currentUser = ref(localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null);
-  const profile = ref(localStorage.getItem("profile") ? JSON.parse(localStorage.getItem("profile")) : null);
+    // State untuk alert notification
+    const showAlert = ref(false);
+    const alertMessage = ref("");
 
-  // State untuk alert notification
-  const showAlert = ref(false);
-  const alertMessage = ref("");
+    //Comment state
+    const isSubmittingComment = ref(false);
+    const commentError = ref(null);
 
-  function showNotification(message) {
-    alertMessage.value = message;
-    showAlert.value = true;
-    
-    setTimeout(() => {
-      showAlert.value = false;
-    }, 5000);
-  }
-
-  async function register({ name, email, password, password_confirmation }) {
-    try {
-      const { data } = await apiClient.post("/auth/register", {
-        name,
-        email,
-        password,
-        password_confirmation,
-      });
-
-      showNotification(data.message);
-      router.replace("/login");
-    } catch (error) {
-      console.error(error.message);
-      showNotification("Pendaftaran gagal, silakan coba lagi.");
+    function showNotification(message) {
+      alertMessage.value = message;
+      showAlert.value = true;
+      
+      setTimeout(() => {
+        showAlert.value = false;
+      }, 5000);
     }
-  }
 
-  async function login({ email, password }) {
-    try {
-      const { data } = await apiClient.post("/auth/login", { email, password });
+    async function register({ name, email, password, password_confirmation }) {
+      try {
+        const { data } = await apiClient.post("/auth/register", {
+          name,
+          email,
+          password,
+          password_confirmation,
+        });
 
-      token.value = data.token;
-      currentUser.value = data.user;
-
-      localStorage.setItem("token", token.value);
-      localStorage.setItem("user", JSON.stringify(currentUser.value));
-
-
-      if (currentUser.value?.role?.name === "admin"){
-        showNotification("Berhasil login sebagai admin");
-        router.replace("/");
-      } else if (currentUser.value?.is_verified) {
-        showNotification("Selamat anda berhasil Login");
-        router.replace("/");
-      } else {
-        showNotification("Silakan verifikasi email Anda terlebih dahulu");
-        router.replace("/verify-account");
+        showNotification(data.message);
+        router.replace("/login");
+      } catch (error) {
+        console.error(error.message);
+        showNotification("Pendaftaran gagal, silakan coba lagi.");
       }
-    } catch (error) {
-      console.error(error.message);
-      showNotification("Email atau Password salah.");
     }
-  }
 
-  async function logout() {
-    try {
-      const { data } = await apiClient.post("/auth/logout", null, {
-        headers: { Authorization: `Bearer ${token.value}` },
-      });
+    async function login({ email, password }) {
+      try {
+        const { data } = await apiClient.post("/auth/login", { email, password });
 
-      token.value = null;
-      currentUser.value = null;
-      profile.value = null;
+        token.value = data.token;
+        currentUser.value = data.user;
 
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("profile");
+        localStorage.setItem("token", token.value);
+        localStorage.setItem("user", JSON.stringify(currentUser.value));
 
-      showNotification(data.message);
-      router.replace("/login");
-    } catch (error) {
-      console.error(error.message);
-      showNotification("Gagal logout, silakan coba lagi.");
+
+        if (currentUser.value?.role?.name === "admin"){
+          showNotification("Berhasil login sebagai admin");
+          router.replace("/");
+        } else if (currentUser.value?.is_verified) {
+          showNotification("Selamat anda berhasil Login");
+          router.replace("/");
+        } else {
+          showNotification("Silakan verifikasi email Anda terlebih dahulu");
+          router.replace("/verify-account");
+        }
+      } catch (error) {
+        console.error(error.message);
+        showNotification("Email atau Password salah.");
+      }
     }
-  }
 
-  async function getUserLogged() {
-    try {
-      const { data } = await apiClient.get("/auth/me", {
-        headers: { Authorization: `Bearer ${token.value}` },
-      });
+    async function logout() {
+      try {
+        const { data } = await apiClient.post("/auth/logout", null, {
+          headers: { Authorization: `Bearer ${token.value}` },
+        });
 
-      currentUser.value = data.user;
-      localStorage.setItem("user", JSON.stringify(data.user));
+        token.value = null;
+        currentUser.value = null;
+        profile.value = null;
 
-      return data.user;
-    } catch (error) {
-      console.error(error.message);
-      showNotification("Gagal mengambil data pengguna.");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("profile");
+
+        showNotification(data.message);
+        router.replace("/login");
+      } catch (error) {
+        console.error(error.message);
+        showNotification("Gagal logout, silakan coba lagi.");
+      }
     }
-  }
 
-  async function verifyAccount(otp) {
-    try {
-      const { data } = await apiClient.post(
-        "/auth/account_verification",
-        { otp },
-        { headers: { Authorization: `Bearer ${token.value}` } }
-      );
+    async function getUserLogged() {
+      try {
+        const { data } = await apiClient.get("/auth/me", {
+          headers: { Authorization: `Bearer ${token.value}` },
+        });
 
-      await getUserLogged();
+        currentUser.value = data.user;
+        localStorage.setItem("user", JSON.stringify(data.user));
 
-      showNotification("Selamat Anda berhasil login dan telah terverifikasi.");
-      router.replace("/");
-    } catch (error) {
-      console.error(error.message);
-      showNotification("Kode OTP salah atau sudah kadaluarsa.");
+        return data.user;
+      } catch (error) {
+        console.error(error.message);
+        showNotification("Gagal mengambil data pengguna.");
+      }
     }
-  }
 
-  async function generateOtp(email) {
-    try {
-      const { data } = await apiClient.post(
-        "/auth/generate_otp_code",
-        { email },
-        { headers: { Authorization: `Bearer ${token.value}` } }
-      );
+    async function verifyAccount(otp) {
+      try {
+        const { data } = await apiClient.post(
+          "/auth/account_verification",
+          { otp },
+          { headers: { Authorization: `Bearer ${token.value}` } }
+        );
 
-      showNotification(data.message);
-    } catch (error) {
-      console.error(error.message);
-      showNotification("Gagal mengirim ulang kode OTP.");
+        await getUserLogged();
+
+        showNotification("Selamat Anda berhasil login dan telah terverifikasi.");
+        router.replace("/");
+      } catch (error) {
+        console.error(error.message);
+        showNotification("Kode OTP salah atau sudah kadaluarsa.");
+      }
     }
-  }
 
-  async function uploadProfile(payload) {
-    try {
-      const { data } = await apiClient.post("/auth/profile", payload, {
-        headers: { Authorization: `Bearer ${token.value}` },
-      });
+    async function generateOtp(email) {
+      try {
+        const { data } = await apiClient.post(
+          "/auth/generate_otp_code",
+          { email },
+          { headers: { Authorization: `Bearer ${token.value}` } }
+        );
 
-      profile.value = data.user;
-      localStorage.setItem("profile", JSON.stringify(profile.value));
-
-      console.log(data);
-    } catch (error) {
-      console.error(error);
-      showNotification("Gagal mengupdate profil.");
+        showNotification(data.message);
+      } catch (error) {
+        console.error(error.message);
+        showNotification("Gagal mengirim ulang kode OTP.");
+      }
     }
-  }
-
-  return {
-    token,
-    register,
-    currentUser,
-    login,
-    logout,
-    getUserLogged,
-    verifyAccount,
-    generateOtp,
-    uploadProfile,
-    showAlert,
-    alertMessage,
-    showNotification,
-  };
-});
+    async function uploadProfile(payload) {
+      try {
+        const { data } = await apiClient.post("/profile", payload, {
+          headers: { Authorization: `Bearer ${token.value}` },
+        });
+    
+        currentUser.value = data.user;
+        localStorage.setItem("profile", JSON.stringify(data.user));
+        
+        showNotification("Profil berhasil diperbarui!");
+      } catch (error) {
+        console.error("Gagal mengupdate profil:", error.response?.data);
+        showNotification(error.response?.data?.message || "Gagal mengupdate profil.");
+      }
+    }
+    async function uploadComment(payload) {
+      try {
+        isSubmittingComment.value = true;
+        commentError.value = null;
+    
+        if (!token.value) {
+          throw new Error("Silakan login terlebih dahulu.");
+        }
+    
+        // Validasi payload
+        if (!payload.news_id || !payload.comment) {
+          throw new Error("news_id dan komentar tidak boleh kosong.");
+        }
+    
+        const { data } = await apiClient.post("/comment", 
+          {
+            news_id: payload.news_id,
+            comment: payload.comment
+          }, 
+          {
+            headers: { Authorization: `Bearer ${token.value}` }
+          }
+        );
+    
+        showNotification("Komentar berhasil diunggah!");
+        return data;
+      } catch (error) {
+        const errorMessage = error.response?.data?.message || error.message || "Gagal mengunggah komentar.";
+        commentError.value = errorMessage;
+        showNotification(errorMessage);
+        throw error;
+      } finally {
+        isSubmittingComment.value = false;
+      }
+    }    
+    return {
+      token,
+      register,
+      currentUser,
+      login,
+      logout,
+      getUserLogged,
+      verifyAccount,
+      generateOtp,
+      uploadProfile,
+      showAlert,
+      alertMessage,
+      showNotification,
+      profile,
+      isSubmittingComment,
+      commentError,
+      uploadComment
+    };
+  });

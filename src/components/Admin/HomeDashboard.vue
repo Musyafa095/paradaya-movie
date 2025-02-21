@@ -1,113 +1,175 @@
 <template>
-  <div class="p-6 space-y-6">
-    <!-- Welcome Header -->
-    <div class="flex flex-col md:flex-row justify-between items-center">
-      <div class="text-center md:text-left">
-        <h1 class="text-3xl font-bold text-gray-800">Selamat Datang, Admin</h1>
-        <p class="text-gray-600">Portal Berita Dashboard</p>
+  <div class="container mx-auto px-4 py-6 to-base-100">
+    <!-- Header Section -->
+    <header class="mb-8">
+      <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-600">ParadayaNews.com 🚀</h1>
+        <div class="text-gray-700 font-roboto ">
+          {{ currentTime }}
+        </div>
       </div>
-      <div class="text-right text-sm text-gray-500 mt-2 md:mt-0">{{ currentDate }}</div>
-    </div>
+      
+      <!-- Statistics Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white p-4 rounded-lg shadow">
+          <h3 class="text-lg font-semibold text-gray-700">Total Berita 📰</h3>
+          <p class="text-2xl font-bold text-blue-600">{{ totalNews }}</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow">
+          <h3 class="text-lg font-semibold text-gray-700">Jumalah Kategori 📝 </h3>
+          <p class="text-2xl font-bold text-green-600">{{ totalCategories }}</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow">
+          <h3 class="text-lg font-semibold text-gray-700">Latest Update 📖</h3>
+          <p class="text-md text-gray-600">{{ latestUpdate }}</p>
+        </div>
+      </div>
+    </header>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <StatCard title="Total Pembaca" :value="totalViews" icon="fas fa-users" color="text-blue-500" />
-      <StatCard title="News Diterbitkan" :value="totalNews" icon="fas fa-newspaper" color="text-purple-500" />
-      <StatCard title="Total Komentar" :value="totalComments" icon="fas fa-comments" color="text-orange-500" />
-      <StatCard title="Total Share" :value="totalShares" icon="fas fa-share-alt" color="text-green-500" />
-    </div>
+    <!-- Categories Section -->
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold mb-4">Categories</h2>
+      <div class="flex flex-wrap gap-2">
+        <button
+          @click="fetchNewsByCategory(null)"
+          :class="[
+            'px-4 py-2 rounded-full text-sm font-medium transition-colors',
+            !selectedCategory 
+              ? 'bg-blue-600 text-white' 
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          ]"
+        >
+          All News
+        </button>
+        <button
+          v-for="cat in category"
+          :key="cat.id"
+          @click="fetchNewsByCategory(cat.id)"
+          :class="[
+            'px-4 py-2 rounded-full text-sm font-medium transition-colors',
+            selectedCategory === cat.id 
+              ? 'bg-blue-600 text-white' 
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          ]"
+        >
+          {{ cat.name }}
+        </button>
+      </div>
+    </section>
 
-    <!-- Charts -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <ChartCard title="Statistik Pembaca">
-        <canvas ref="viewsChart"></canvas>
-      </ChartCard>
-      <ChartCard title="Kategori yang Sering Dilihat">
-        <canvas ref="categoryChart"></canvas>
-      </ChartCard>
-    </div>
+    <!-- News Grid -->
+    <section>
+      <h2 class="text-2xl font-semibold mb-4">Latest News</h2>
+      
+      <!-- Loading State -->
+      <div v-if="isLoading" class="flex justify-center items-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
 
-    <!-- News Terbaru -->
-    <div class="bg-white rounded-lg shadow p-4 overflow-x-auto">
-      <h3 class="text-lg font-semibold mb-4">News Terbaru</h3>
-      <table class="min-w-full text-left text-sm">
-        <thead>
-          <tr class="bg-gray-50 text-gray-500 uppercase">
-            <th class="px-4 py-3">Judul</th>
-            <th class="px-4 py-3">Kategori</th>
-            <th class="px-4 py-3">Views</th>
-            <th class="px-4 py-3">Status</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-          <tr v-for="newsItem in news" :key="newsItem.id">
-            <td class="px-4 py-3">{{ newsItem.title }}</td>
-            <td class="px-4 py-3">{{ newsItem.category.name }}</td>
-            <td class="px-4 py-3">{{ newsItem.views }}</td>
-            <td class="px-4 py-3">
-              <span :class="getStatusClass(newsItem.status)">{{ newsItem.status }}</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <!-- Error State -->
+      <div v-else-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        {{ error }}
+      </div>
+
+      <!-- News Grid -->
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div v-for="news in newsItems" :key="article.id" class="bg-white rounded-lg shadow overflow-hidden">
+          <img 
+            :src="news.image || 'placeholder-image.jpg'" 
+            :alt="news.title"
+            class="w-full h-48 object-cover"
+          >
+          <div class="p-4">
+            <div class="text-sm text-gray-600 mb-2">
+              {{ formatDate(news.created_at) }}
+            </div>
+            <h3 class="text-xl font-semibold mb-2 line-clamp-2">{{ news.title }}</h3>
+            <p class="text-gray-600 mb-4 line-clamp-3">{{ news.content }}</p>
+            <router-link 
+              :to="{ name: 'NewsDetail', params: { id: news.id }}"
+              class="text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Read More →
+            </router-link>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useNewsStore } from '@/stores/news';
+import { storeToRefs } from 'pinia';
 import { useCategoryStore } from '@/stores/category';
+import { useNewsStore } from '@/stores/news';
 
-const newsStore = useNewsStore();
+// Store initialization
 const categoryStore = useCategoryStore();
-const viewsChart = ref(null);
-const categoryChart = ref(null);
+const newsStore = useNewsStore();
 
-const news = computed(() => newsStore.news);
-const totalViews = computed(() => newsStore.news.reduce((sum, item) => sum + item.views, 0));
-const totalNews = computed(() => newsStore.news.length);
-const totalComments = computed(() => newsStore.news.reduce((sum, item) => sum + item.comments, 0));
-const totalShares = computed(() => newsStore.news.reduce((sum, item) => sum + item.shares, 0));
-const popularCategories = computed(() => categoryStore.category);
+// Use storeToRefs to maintain reactivity
+const { category } = storeToRefs(categoryStore);
+const { news, isLoading, error } = storeToRefs(newsStore);
 
-const currentDate = computed(() => new Date().toLocaleDateString('id-ID', {
-  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-}));
+// Local state
+const currentTime = ref('');
+const selectedCategory = ref(null);
+const newsItems = ref([]);
 
-const getStatusClass = (status) => ({
-  'px-2 py-1 rounded text-xs font-medium': true,
-  'bg-green-100 text-green-800': status === 'Published',
-  'bg-yellow-100 text-yellow-800': status === 'Draft'
+// Computed properties
+const totalNews = computed(() => newsItems.value?.length || 0);
+const totalCategories = computed(() => category.value?.length || 0);
+const latestUpdate = computed(() => {
+  if (newsItems.value?.length > 0) {
+    return formatDate(newsItems.value[0].created_at);
+  }
+  return 'No updates';
 });
 
+// Methods
+const updateTime = () => {
+  const now = new Date();
+  currentTime.value = new Intl.DateTimeFormat('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  }).format(now);
+};
+
+const formatDate = (date) => {
+  return new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
+
+const fetchNewsByCategory = async (categoryId) => {
+  selectedCategory.value = categoryId;
+  try {
+    const response = await newsStore.getNews(categoryId);
+    newsItems.value = response.data;
+  } catch (err) {
+    console.error('Error fetching news:', err);
+  }
+};
+
+// Initial data fetching
 onMounted(async () => {
-  await newsStore.getNews();
-  await categoryStore.getCategory();
-
-  new Chart(viewsChart.value, {
-    type: 'line',
-    data: {
-      labels: newsStore.news.map((_, index) => `Day ${index + 1}`),
-      datasets: [{
-        label: 'Views',
-        data: newsStore.news.map(news => news.views),
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1
-      }]
-    }
-  });
-
-  new Chart(categoryChart.value, {
-    type: 'bar',
-    data: {
-      labels: popularCategories.map(cat => cat.name),
-      datasets: [{
-        label: 'Jumlah Artikel',
-        data: popularCategories.map(cat => cat.articleCount),
-        backgroundColor: 'rgb(54, 162, 235)'
-      }]
-    }
-  });
+  updateTime();
+  setInterval(updateTime, 1000);
+  
+  try {
+    await categoryStore.getCategory();
+    const response = await newsStore.getNews();
+    newsItems.value = response.data;
+  } catch (err) {
+    console.error('Error fetching initial data:', err);
+  }
 });
 </script>
