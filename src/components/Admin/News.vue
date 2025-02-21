@@ -150,15 +150,27 @@
   </div>
 </div>
     </section>
+    <div class="join flex justify-center items-center mt-4">
+  <button class="join-item btn btn-info"
+  @click="changePage(currentPage - 1)" 
+  :disabled="currentPage === 1"
+  >« Prev</button>
+  <button class="join-item btn">Halaman {{ currentPage }}{{ totalPages }}</button>
+  <button class="join-item btn btn-secondary"
+  @click="changePage(currentPage + 1)"
+  :disabled="currentPage === totalPages"
+  >Next »</button>
+</div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { apiClient } from "@/config/api";
 import { authStore } from "@/stores/auth";
 import { useNewsStore } from "@/stores/news";
 import { useCategoryStore } from "@/stores/category";
+
 
 const store = authStore();
 const newsStore = useNewsStore();
@@ -166,6 +178,7 @@ const categoryStore = useCategoryStore();
 const categoryList = ref([]);
 const fileInput = ref(null);
 const imagePreview = ref(null);
+const currentPage = ref(1);
 
 const newsData = ref({
   title: "",
@@ -180,7 +193,7 @@ const id = ref(null);
 
 const fetchNews = async () => {
   try {
-    await newsStore.getNews();
+    await newsStore.getNews(currentPage.value);
   } catch (error) {
     console.error("Error fetching news:", error);
     alert("Failed to fetch news. Please try again later.");
@@ -312,6 +325,14 @@ const actionNews = async () => {
     }
   }
 };
+const changePage = (page) => {
+  if (page >= 1 && page <= newsStore.totalPages) {
+    currentPage.value = page;
+    fetchNews();
+  }
+};
+watch (currentPage, fetchNews);
+
 
 onMounted(async () => {
   await Promise.all([fetchNews(), fetchCategories()]);

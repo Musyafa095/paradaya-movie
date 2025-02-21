@@ -3,24 +3,32 @@ import { defineStore } from "pinia";
 import { apiClient } from "@/config/api";
 
 export const useNewsStore = defineStore("news", () => {
-  const news = ref([]); // List berita
-  const newsDetail = ref(null); // Detail berita
-  const comments = ref([]); // List komentar
+  const news = ref([]);
+  const newsDetail = ref(null); 
+  const comments = ref([]); 
   const isLoading = ref(false);
   const error = ref(null);
+  const currentPage = ref(1);
+  const totalPages = ref(1); 
+  const totalNewsCount = ref(0);  
 
   // Mengambil semua berita
-  const getNews = async (categoryId = null) => {
+  const getNews = async (page = 1, categoryId = null) => {
     isLoading.value = true;
     error.value = null;
     try {
-      const url = categoryId ? `/news?category=${categoryId}` : "/news";
+      const url = categoryId
+      ? `/news?page=${page}&per_page=8&category=${categoryId}`
+      : `/news?page=${page}&per_page=8`;
       const response = await apiClient.get(url);
-      news.value = response.data.data.data || []; // Pastikan tidak undefined
-    } catch (err) {
+      news.value = response.data.data.data || [];
+      currentPage.value = response.data.data.current_page || 1;
+      totalPages.value = response.data.data.last_page || 1;
+      totalNewsCount.value = response.data.data.total|| 0;   
+      } catch (err) {
       error.value = err.message || "Gagal mengambil data berita";
       console.error("Error fetching news:", err);
-      news.value = []; // Pastikan news tidak kosong saat error
+      news.value = [];
     } finally {
       isLoading.value = false;
     }
@@ -32,13 +40,9 @@ export const useNewsStore = defineStore("news", () => {
     error.value = null;
     try {
       const response = await apiClient.get(`/news/${id}`);
-      
-      // Pastikan respons API memiliki struktur yang benar
       if (!response.data || !response.data.data) {
         throw new Error("Berita tidak ditemukan");
       }
-  
-      // Simpan data ke newsDetail
       newsDetail.value = response.data.data;
       return response.data.data; 
     } catch (err) {
@@ -56,20 +60,18 @@ export const useNewsStore = defineStore("news", () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const response = await apiClient.get(`/comments?news_id=${newsId}`);
-      
-      // Pastikan respons API memiliki struktur yang benar
+      const response = await apiClient.get(`/comment?news_id=${newsId}`);
       if (!response.data || !response.data.data) {
         throw new Error("Komentar tidak ditemukan");
       }
-
-      comments.value = response.data.data; // Simpan komentar
-      return comments.value; // Kembalikan data komentar
+      comments.value = response.data.data || []; 
+      return comments.value;  
     } catch (err) {
       error.value = err.message || "Gagal mengambil komentar";
       console.error("Error fetching comments:", err);
+      comments.value = [];
       throw err; // Lempar error agar bisa ditangkap di komponen
-    } finally {
+    } finally {  
       isLoading.value = false;
     }
   };
@@ -79,12 +81,14 @@ export const useNewsStore = defineStore("news", () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const response = await apiClient.post("/comments", payload);
-      return response.data; // Kembalikan data komentar yang baru saja ditambahkan
+      const response = await apiClient.post("/comment", payload);
+      const newComment = response.data.data;
+      comments.value.unshift(newComment);
+      return newComment;
     } catch (err) {
       error.value = err.message || "Gagal mengirim komentar";
       console.error("Error uploading comment:", err);
-      throw err; // Lempar error agar bisa ditangkap di komponen
+      throw err;  
     } finally {
       isLoading.value = false;
     }
@@ -99,6 +103,9 @@ export const useNewsStore = defineStore("news", () => {
     getNews, 
     getNewsById, 
     getCommentsByNewsId, 
-    uploadComment 
+    uploadComment,
+    totalPages,
+    currentPage,
+    totalNewsCount
   };
 });

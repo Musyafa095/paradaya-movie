@@ -32,9 +32,15 @@
       <!-- Profile dropdown -->
       <div class="dropdown dropdown-end"
            @click="toggleProfileDropdown">
-        <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-          <div class="w-10 rounded-full">
+           <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+             <div class="w-10 rounded-full">
             <img
+              v-if="user?.profile?.image"
+              alt="User profile"
+              :src="user.profile.image"
+            />
+            <img
+              v-else
               alt="Profile"
               src="https://images.vexels.com/content/145908/preview/male-avatar-maker-2a7919.png"
             />
@@ -69,28 +75,30 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useThemeStore } from '@/stores/themeStore';
 import { authStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const auth = authStore()
 const user = auth.currentUser;
-const ThemeStore = useThemeStore();
-const isMobileSearchOpen = ref(false);
+const themeStore = useThemeStore();
 const isProfileDropdownOpen = ref(false);
 
 const toggleProfileDropdown = () => {
   isProfileDropdownOpen.value = !isProfileDropdownOpen.value;
 };
 
-const isDarkTheme = computed({
-  get() {
-    return ThemeStore.theme === 'dark'; 
-  },
-  set(value) {
-    ThemeStore.theme = value ? 'dark' : 'light'; 
-    document.documentElement.setAttribute('data-theme', ThemeStore.theme);
-  }
+  const isDarkTheme = computed({
+  get: () => themeStore.theme === "dark",
+  set: (value) => themeStore.setTheme(value ? "dark" : "light"),
+});
+
+// Pastikan perubahan langsung terjadi di `<html>`
+watch(() => themeStore.theme, (newTheme) => {
+  document.documentElement.setAttribute("data-theme", newTheme);
 });
 
 const onLogout = async () => {

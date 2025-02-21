@@ -45,6 +45,18 @@
         <CardNews :dataProps="filteredNews" />
       </div>
     </div>
+    <!-- pagnitation -->
+    <div class="join flex justify-center items-center">
+  <button class="join-item btn btn-info"
+  @click="changePage(currentPage - 1)" 
+  :disabled="currentPage === 1"
+  >« Prev</button>
+  <button class="join-item btn">Halaman {{ currentPage }}{{ totalPages }}</button>
+  <button class="join-item btn btn-secondary"
+  @click="changePage(currentPage + 1)"
+  :disabled="currentPage === totalPages"
+  >Next »</button>
+</div>
   </DefaultLayout>
 </template>
 
@@ -65,6 +77,7 @@ const news = useNewsStore();
 const isLoading = ref(true);
 const error = ref(null);
 const currentCategory = ref(null);
+const currentPage = ref(1);
 
 const getCategoryName = computed(() => {
   if (!currentCategory.value) return "";
@@ -104,7 +117,7 @@ const fetchNews = async () => {
   try {
     await Promise.all([
       category.getCategory(),
-      news.getNews()
+      news.getNews(currentPage.value)
     ]);
   } catch (err) {
     error.value = "Gagal memuat data";
@@ -113,6 +126,13 @@ const fetchNews = async () => {
     isLoading.value = false;
   }
 };
+const changePage = (page) => {
+  if (page >= 1 && page <= news.totalPages) {
+    currentPage.value = page;
+    fetchNews();
+  }
+};
+watch (currentPage, fetchNews);
 
 onMounted(fetchNews);
 </script>

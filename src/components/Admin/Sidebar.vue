@@ -39,7 +39,7 @@
     <!-- Sidebar -->
     <div
       :class="[
-        'bg-base-200 fixed lg:relative z-20 min-h-screen transition-all duration-300',
+        'bg-base-100 fixed lg:relative z-20 min-h-screen transition-all duration-300',
         isCollapsed ? 'w-20' : 'w-64',
         isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       ]"
@@ -72,7 +72,7 @@
           'font-bold transition-all duration-300',
           isCollapsed ? 'text-lg text-center' : 'text-2xl'
         ]">
-          {{ isCollapsed ? 'PD' : 'Dashboard Paradaya' }}
+          {{ isCollapsed ? 'PD' : 'Dashboard ParadayaNews.com' }}
         </h2>
       </div>
 

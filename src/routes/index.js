@@ -96,13 +96,6 @@ router.beforeEach(async(to, from, next) => {
     await store.getUserLogged();
   }
 
-  if (to.meta.requiresAuth) {
-    if (!store.token) {
-      store.showNotification("Anda harus login terlebih dahulu");
-      return next("/login");
-    }
-  }
-
   // **Pastikan hanya user yang perlu verifikasi email**
   if (store.token && store.currentUser) {
     if (
