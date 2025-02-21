@@ -1,29 +1,29 @@
 <template>
-  <div class="container mx-auto px-4 py-6 to-base-100">
+  <div class="container mx-auto px-4 py-6">
     <!-- Header Section -->
     <header class="mb-8">
       <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-600">ParadayaNews.com 🚀</h1>
-        <div class="text-gray-700 font-roboto ">
-          {{ currentTime }}
+        <h1 class="text-3xl font-bold font-montserrat light:text-gray-900">ParadayaNews.com 🚀</h1>
+        <div class="font-roboto text-gray-600 ">
+          {{ currentTime }} WIB 🫠 
         </div>
       </div>
       
       <!-- Statistics Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div class="bg-white p-4 rounded-lg shadow">
+        <div class=" bg-white p-4 rounded-lg shadow-lg">
           <h3 class="text-lg font-semibold text-gray-700">Total Berita 📰</h3>
-          <p class="text-2xl font-bold text-blue-600">{{ totalNews }}</p>
+          <p class="text-2xl font-bold text-blue-600">{{ totalNewsCount }}</p>
         </div>
-        <div class="bg-white p-4 rounded-lg shadow">
-          <h3 class="text-lg font-semibold text-gray-700">Jumalah Kategori 📝 </h3>
+        <div class="bg-white p-4 rounded-lg shadow-lg">
+          <h3 class="text-lg font-semibold text-gray-700">Jumlah Kategori 📝 </h3>
           <p class="text-2xl font-bold text-green-600">{{ totalCategories }}</p>
         </div>
-        <div class="bg-white p-4 rounded-lg shadow">
-          <h3 class="text-lg font-semibold text-gray-700">Latest Update 📖</h3>
-          <p class="text-md text-gray-600">{{ latestUpdate }}</p>
+        <div class="bg-white p-4 rounded-lg shadow-lg">
+          <h3 class="text-lg font-semibold text-gray-700">Terakhir Update Berita 📚</h3>
+          <p class=" text-slate-600">{{ latestNewsUpdate }}</p>
         </div>
-      </div>
+      </div>  
     </header>
 
     <!-- Categories Section -->
@@ -72,37 +72,46 @@
       </div>
 
       <!-- News Grid -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div v-for="news in newsItems" :key="article.id" class="bg-white rounded-lg shadow overflow-hidden">
-          <img 
-            :src="news.image || 'placeholder-image.jpg'" 
-            :alt="news.title"
-            class="w-full h-48 object-cover"
-          >
-          <div class="p-4">
-            <div class="text-sm text-gray-600 mb-2">
-              {{ formatDate(news.created_at) }}
-            </div>
-            <h3 class="text-xl font-semibold mb-2 line-clamp-2">{{ news.title }}</h3>
-            <p class="text-gray-600 mb-4 line-clamp-3">{{ news.content }}</p>
-            <router-link 
-              :to="{ name: 'NewsDetail', params: { id: news.id }}"
-              class="text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Read More →
-            </router-link>
-          </div>
-        </div>
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+  <div v-for="news in newsItems" :key="news.id" class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden ease-in-out hover:scale-105">
+    <img 
+      :src="news.image || 'placeholder-image.jpg'" 
+      :alt="news.title"
+      class="w-full h-40 sm:h-48 object-cover"
+    >
+    <div class="card-body p-4 sm:p-5">
+      <div class="text-xs light:text-gray-900 mb-2 uppercase tracking-wide">  
+        {{ formatDate(news.created_at) }}
       </div>
+      <h3 class="card-title text-base sm:text-lg font-semibold light:text-gray-800 mb-2 sm:mb-3 line-clamp-2 hover:text-blue-600 transition-colors">
+        {{ news.title }}
+      </h3>
+      <p class="text-sm light:text-gray-600 mb-3 sm:mb-4  font-montserrat line-clamp-3">
+        {{ news.content }}
+      </p>
+         </div>
+      </div>
+ </div>
     </section>
+    <div class="join flex justify-center items-center mt-4">
+  <button class="join-item btn btn-info"
+  @click="changePage(currentPage - 1)" 
+  :disabled="currentPage === 1"
+  >« Prev</button>
+  <button class="join-item btn">Halaman {{ currentPage }} dari {{ totalPages }}</button>
+  <button class="join-item btn btn-secondary"
+  @click="changePage(currentPage + 1)"
+  :disabled="currentPage === totalPages"
+  >Next »</button>
+</div>
   </div>
 </template>
-
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useCategoryStore } from '@/stores/category';
 import { useNewsStore } from '@/stores/news';
+
 
 // Store initialization
 const categoryStore = useCategoryStore();
@@ -110,66 +119,109 @@ const newsStore = useNewsStore();
 
 // Use storeToRefs to maintain reactivity
 const { category } = storeToRefs(categoryStore);
-const { news, isLoading, error } = storeToRefs(newsStore);
-
+const { news, isLoading, error, totalPages, totalNewsCount} = storeToRefs(newsStore);
+const currentPage = ref(1);
 // Local state
 const currentTime = ref('');
 const selectedCategory = ref(null);
-const newsItems = ref([]);
+const newsItems = computed(() => news.value || []);
+const totalCategories = computed(() => category.value?.length || 0);
+
+
+const hariIndonesia = {
+  'Sunday': 'Minggu',
+  'Monday': 'Senin',
+  'Tuesday': 'Selasa',
+  'Wednesday': 'Rabu',
+  'Thursday': 'Kamis',
+  'Friday': 'Jumat',
+  'Saturday': 'Sabtu'
+};
+
+// Mapping for Indonesian months
+const bulanIndonesia = {
+  'January': 'Januari',
+  'February': 'Februari',
+  'March': 'Maret',
+  'April': 'April',
+  'May': 'Mei',
+  'June': 'Juni',
+  'July': 'Juli',
+  'August': 'Agustus',
+  'September': 'September',
+  'October': 'Oktober',
+  'November': 'November',
+  'December': 'Desember'
+};
 
 // Computed properties
-const totalNews = computed(() => newsItems.value?.length || 0);
-const totalCategories = computed(() => category.value?.length || 0);
-const latestUpdate = computed(() => {
-  if (newsItems.value?.length > 0) {
-    return formatDate(newsItems.value[0].created_at);
+
+
+const latestNewsUpdate = computed(() => {
+  if (newsItems.value && newsItems.value.length > 0) {
+    const sortedNews = [...newsItems.value].sort((a, b) => 
+      new Date(b.created_at) - new Date(a.created_at)
+    );
+    return formatDate(sortedNews[0].created_at);
   }
-  return 'No updates';
+  return 'Belum ada update';
 });
+
+
 
 // Methods
 const updateTime = () => {
   const now = new Date();
-  currentTime.value = new Intl.DateTimeFormat('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  }).format(now);
+  const weekday = hariIndonesia[now.toLocaleString('en-US', { weekday: 'long' })];
+  const month = bulanIndonesia[now.toLocaleString('en-US', { month: 'long' })];
+  const date = now.getDate();
+  const year = now.getFullYear();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  
+  currentTime.value = `${weekday}, ${date} ${month} ${year} ${hours}:${minutes}:${seconds}`;
 };
-
 const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+  const d = new Date(date);
+  const day = hariIndonesia[d.toLocaleString('en-US', { weekday: 'long' })];
+  const month = bulanIndonesia[d.toLocaleString('en-US', { month: 'long' })];
+  
+  return `${day}, ${d.getDate()} ${month} ${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 };
-
-const fetchNewsByCategory = async (categoryId) => {
+// Fungsi mengambil berita berdasarkan kategori
+const fetchNewsByCategory = async (categoryId, page = 1) => {
   selectedCategory.value = categoryId;
-  try {
-    const response = await newsStore.getNews(categoryId);
-    newsItems.value = response.data;
+  try { 
+    await newsStore.getNews(page, categoryId);
   } catch (err) {
-    console.error('Error fetching news:', err);
+    console.error("Error fetching news:", err);
   }
 };
 
-// Initial data fetching
+// Fungsi untuk mengambil berita dengan pagination
+const changePage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {  
+    currentPage.value = page;
+    fetchNewsByCategory(selectedCategory.value, page);
+  }
+};
+
+
+// Memuat data awal
 onMounted(async () => {
   updateTime();
-  setInterval(updateTime, 1000);
-  
+  setInterval(updateTime, 1000);       
   try {
-    await categoryStore.getCategory();
-    const response = await newsStore.getNews();
-    newsItems.value = response.data;
+    await Promise.all([
+      categoryStore.getCategory(),
+      newsStore.getNews(currentPage.value)  
+    ]);
   } catch (err) {
-    console.error('Error fetching initial data:', err);
+    console.error("Error saat memuat data:", err);
   }
+});
+watch (currentPage, (newPage) => {
+  fetchNewsByCategory(selectedCategory.value, newPage);
 });
 </script>

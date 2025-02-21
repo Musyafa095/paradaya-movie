@@ -1,8 +1,8 @@
 <template>
   <div class="container mx-auto px-4">
-    <h1 class="text-3xl font-semibold font-roboto text-center my-4">Halaman Category📝</h1>
+    <h1 class="text-3xl font-semibold font-roboto text-center my-4 ">Halaman Category📝</h1>
     <section class="my-3" v-show="inputAction">
-      <h2 class="text-lg text-info font-montserrat">{{ isEdit ? "Edit" : "Tambah" }} Category</h2>
+      <h2 class="text-lg font-bold font-montserrat">{{ isEdit ? "Edit" : "Tambah" }} Category</h2>
       <form @submit.prevent="actionCategory">
         <input
           type="text"
@@ -26,7 +26,7 @@
     </section>
     <section>
       <div class="flex justify-between items-center my-5">
-        <h2 class="text-lg font-bold text-info">List Category</h2>
+        <h2 class="text-lg font-bold font-roboto">List Category</h2>
         <button
           @click="tambahForm"
           class="btn btn-success btn-sm px-4 py-2 rounded-xl"
@@ -92,7 +92,7 @@ const fetchCategory = async () => {
     categoryData.value = data.data || [];
   } catch (error) {
     console.error("Error fetching categories:", error);
-    alert("Failed to fetch categories. Please try again later.");
+    store.showNotification("Gagal mengambil data category. Silakan coba lagi.");
   }
 };
 
@@ -120,18 +120,18 @@ const handleEdit = (item) => {
 };
 
 const handleDelete = async (itemId) => {
-  if (!confirm("Are you sure you want to delete this category?")) return;
+  if (!confirm("Apakah anda yakin ingin menghapus category ini 🤔?")) return;
   try {
     const response = await apiClient.post(`/category/${itemId}?_method=DELETE`, null,{
       headers : {
         Authorization: `Bearer ${store.token}`
       }
     });
-    alert(response.data.message || "Category deleted successfully.");
+    store.showNotification("Berhasil menghapus category.");
     await fetchCategory();
   } catch (error) {
     console.error("Error deleting category:", error);
-    alert("Failed to delete category. Please try again later.");
+    store.showNotification("Gagal menghapus category, silahkan coba lagi.");
   }
 };
 
@@ -148,7 +148,7 @@ const actionCategory = async () => {
           headers: { Authorization: `Bearer ${store.token}` },
         }
       );
-      alert(response.data.message || "Category updated successfully.");
+      store.showNotification("Category berhasil diupdate.");
     } else {
       // Create new category
       response = await apiClient.post(
@@ -158,18 +158,18 @@ const actionCategory = async () => {
           headers: { Authorization: `Bearer ${store.token}` },
         }
       );
-      alert(response.data.message || "Category added successfully.");
+      store.showNotification("Category berhasil ditambahkan.");
     }
 
-    await fetchCategory(); // Refresh data setelah operasi berhasil
-    closeForm(); // Tutup form
+    await fetchCategory(); 
+    closeForm(); 
   } catch (error) {
     if (error.response) {
       console.error("Server responded with:", error.response);
-      alert(error.response.data.message || "An error occurred.");
+      store.showNotification(error.response.data.message || "An error occurred.");
     } else {
       console.error("Error:", error);
-      alert("Failed to save category. Please check your network or try again later.");
+      store.showNotification("Failed to save category. Please check your network or try again later.");
     }
   }
 };

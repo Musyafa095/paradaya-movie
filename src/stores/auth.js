@@ -13,10 +13,6 @@
     const showAlert = ref(false);
     const alertMessage = ref("");
 
-    //Comment state
-    const isSubmittingComment = ref(false);
-    const commentError = ref(null);
-
     function showNotification(message) {
       alertMessage.value = message;
       showAlert.value = true;
@@ -154,41 +150,6 @@
         console.error("Gagal mengupdate profil:", error.response?.data);
         showNotification(error.response?.data?.message || "Gagal mengupdate profil.");
       }
-    }
-    async function uploadComment(payload) {
-      try {
-        isSubmittingComment.value = true;
-        commentError.value = null;
-    
-        if (!token.value) {
-          throw new Error("Silakan login terlebih dahulu.");
-        }
-    
-        // Validasi payload
-        if (!payload.news_id || !payload.comment) {
-          throw new Error("news_id dan komentar tidak boleh kosong.");
-        }
-    
-        const { data } = await apiClient.post("/comment", 
-          {
-            news_id: payload.news_id,
-            comment: payload.comment
-          }, 
-          {
-            headers: { Authorization: `Bearer ${token.value}` }
-          }
-        );
-    
-        showNotification("Komentar berhasil diunggah!");
-        return data;
-      } catch (error) {
-        const errorMessage = error.response?.data?.message || error.message || "Gagal mengunggah komentar.";
-        commentError.value = errorMessage;
-        showNotification(errorMessage);
-        throw error;
-      } finally {
-        isSubmittingComment.value = false;
-      }
     }    
     return {
       token,
@@ -204,8 +165,5 @@
       alertMessage,
       showNotification,
       profile,
-      isSubmittingComment,
-      commentError,
-      uploadComment
-    };
-  });
+     };
+});
