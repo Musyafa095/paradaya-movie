@@ -44,66 +44,26 @@ export const useNewsStore = defineStore("news", () => {
         throw new Error("Berita tidak ditemukan");
       }
       newsDetail.value = response.data.data;
-      return response.data.data; 
+      comments.value = response.data.data.comments || [];
+      return newsDetail.value;
     } catch (err) {
       error.value = err.message || "Gagal mengambil detail berita";
       console.error("Error fetching news detail:", err);
-      newsDetail.value = null; // Pastikan null saat gagal
-      throw err; // Lempar error agar bisa ditangkap di komponen
-    } finally {
-      isLoading.value = false;
-    }
-  };
-
-  // Mengambil komentar berdasarkan news_id
-  const getCommentsByNewsId = async (newsId) => {
-    isLoading.value = true;
-    error.value = null;
-    try {
-      const response = await apiClient.get(`/comment?news_id=${newsId}`);
-      if (!response.data || !response.data.data) {
-        throw new Error("Komentar tidak ditemukan");
-      }
-      comments.value = response.data.data || []; 
-      return comments.value;  
-    } catch (err) {
-      error.value = err.message || "Gagal mengambil komentar";
-      console.error("Error fetching comments:", err);
+      newsDetail.value = null; // 
       comments.value = [];
       throw err; // Lempar error agar bisa ditangkap di komponen
-    } finally {  
-      isLoading.value = false;
-    }
-  };
-
-  // Mengirim komentar
-  const uploadComment = async (payload) => {
-    isLoading.value = true;
-    error.value = null;
-    try {
-      const response = await apiClient.post("/comment", payload);
-      const newComment = response.data.data;
-      comments.value.unshift(newComment);
-      return newComment;
-    } catch (err) {
-      error.value = err.message || "Gagal mengirim komentar";
-      console.error("Error uploading comment:", err);
-      throw err;  
     } finally {
       isLoading.value = false;
     }
   };
-
-  return { 
+    return { 
     news, 
     newsDetail, 
-    comments, // Tambahkan ini agar bisa dipakai di komponen
+    comments,
     isLoading, 
     error, 
     getNews, 
     getNewsById, 
-    getCommentsByNewsId, 
-    uploadComment,
     totalPages,
     currentPage,
     totalNewsCount

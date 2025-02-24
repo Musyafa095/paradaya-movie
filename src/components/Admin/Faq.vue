@@ -68,11 +68,11 @@ export default {
             },
             {
               question: 'Bagaimana cara mengakses berita?',
-              answer: 'Anda dapat mengakses berita melalui halaman utama website kami atau menggunakan menu kategori untuk menemukan berita berdasarkan topik yang Anda minati.'
+              answer: 'Anda dapat mengakses berita melalui halaman utama website ParadayaNews.com atau menggunakan menu kategori untuk menemukan berita berdasarkan topik yang Anda minati.'
             },
             {
               question: 'Apakah konten berita dapat diakses secara gratis?',
-              answer: 'Ya, sebagian besar konten berita kami dapat diakses secara gratis. Namun, beberapa konten premium mungkin memerlukan langganan.'
+              answer: 'Ya, semua konten berita kami dapat diakses secara gratis. Kami tidak memerlukan pembayaran untuk mengakses konten ini.'
             }
           ]
         },
@@ -81,11 +81,11 @@ export default {
           items: [
             {
               question: 'Bagaimana cara membuat akun?',
-              answer: 'Klik tombol "Daftar" di pojok kanan atas, isi formulir pendaftaran dengan data diri Anda, dan ikuti petunjuk verifikasi email yang akan dikirimkan.'
+              answer: 'Klik tombol "Login" di pojok kanan atas, isi formulir pendaftaran dengan data diri Anda, dan ikuti petunjuk verifikasi email yang akan dikirimkan.'
             },
             {
-              question: 'Bagaimana cara mengubah pengaturan notifikasi?',
-              answer: 'Masuk ke akun Anda, klik menu "Pengaturan", pilih tab "Notifikasi", dan sesuaikan preferensi notifikasi sesuai keinginan Anda.'
+              question: 'Bagaimana cara mengupdate profil?',
+              answer: 'Masuk ke navbar profil, klik menu "Profil", Isi bio, umur dan pilih foto. lalu klik tombol "Simpan" untuk menyimpan perubahan.'
             }
           ]
         },
@@ -98,11 +98,11 @@ export default {
             },
             {
               question: 'Bagaimana cara mencari berita berdasarkan kategori?',
-              answer: 'Gunakan menu kategori di sidebar atau header website untuk menjelajahi berita berdasarkan kategori yang Anda minati.'
+              answer: 'Gunakan menu kategori di bagian atas atau header website untuk menjelajahi berita berdasarkan kategori yang Anda minati.'
             },
             {
               question: 'Apakah saya bisa menyimpan berita untuk dibaca nanti?',
-              answer: 'Ya, Anda dapat menyimpan berita dengan mengklik ikon bookmark di setiap artikel. Berita yang disimpan dapat diakses melalui menu "Bookmark" di akun Anda.'
+              answer: 'Belum, Mohon maaf kami belum menyediakan fitur bookmark untuk saat ini. kami akan kembangkan fitur ini nanti.'
             }
           ]
         },
@@ -111,11 +111,11 @@ export default {
           items: [
             {
               question: 'Apakah ada aplikasi mobile?',
-              answer: 'Ya, Anda dapat mengunduh aplikasi mobile kami di Google Play Store untuk Android atau App Store untuk iOS.'
+              answer: 'Belum, Tapi Anda dapat mengakses ParadayaNews.com melalui browser desktop maupun mobile.'
             },
             {
               question: 'Bagaimana jika saya mengalami masalah teknis?',
-              answer: 'Silakan hubungi tim support kami melalui menu "Bantuan" atau kirim email ke support@paradaya.com untuk mendapatkan bantuan teknis.'
+              answer: 'Silakan hubungi tim support kami melalui email support@paradayaNews.com untuk mendapatkan bantuan teknis.'
             }
           ]
         }
