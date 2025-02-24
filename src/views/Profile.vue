@@ -15,7 +15,7 @@
 
         <form @submit.prevent="handleSubmit" class="mt-4 w-9/12 flex flex-col gap-2 mx-auto">
           <div class="mb-1">
-            <label class="block text-xl font-bold mb-2">Age</label>
+            <label class="block text-xl font-bold mb-2">Umur</label>
             <input
               type="number"
               placeholder="Type here"
@@ -33,9 +33,10 @@
             ></textarea>
           </div>
           <div class="mb-2">
+            <label class="block text-xl font-bold mb-2">Image</label>
             <input
               type="file"
-              class="file-input file-input-ghost bg-white border-black w-full"
+              class="file-input file-input-ghost bg-white border-blue-400 w-full"
               @change="handleImage"
             />
           </div>
@@ -72,7 +73,7 @@ const handleImage = (e) => {
 const handleSubmit = async () => {
   isLoading.value = true;
   const formData = new FormData();
-  formData.append("age", payload.age || ""); // Menghindari 0 jika kosong
+  formData.append("age", payload.age || "");
   formData.append("bio", payload.bio);
 
   if (payload.image) {

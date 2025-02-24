@@ -6,8 +6,24 @@
   export const authStore = defineStore("auth", () => {
     const router = useRouter();
     const token = ref(localStorage.getItem("token") || null);
-    const currentUser = ref(localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null);
-    const profile = ref(localStorage.getItem("profile") ? JSON.parse(localStorage.getItem("profile")) : null);
+    const currentUser = ref(null);
+    const profile = ref(null);
+    try {
+      const storedUser = localStorage.getItem("user");
+      currentUser.value = storedUser ? JSON.parse(storedUser) : null;
+    } catch (error) {
+      console.error("Error parsing user data:", error);
+      localStorage.removeItem("user"); // Hapus data yang korup
+    }
+    
+    try {
+      const storedProfile = localStorage.getItem("profile");
+      profile.value = storedProfile ? JSON.parse(storedProfile) : null;
+    } catch (error) {
+      console.error("Error parsing profile data:", error);
+      localStorage.removeItem("profile"); // Hapus data yang korup
+    }
+    
 
     // State untuk alert notification
     const showAlert = ref(false);
@@ -151,6 +167,30 @@
         showNotification(error.response?.data?.message || "Gagal mengupdate profil.");
       }
     }    
+    async function uploadComment(news_id, comment) {
+      try {
+        if (!currentUser.value) {
+          showNotification("Anda harus login untuk mengirim komentar.");
+          return;
+        }
+    
+        const payload = {
+          user_id: currentUser.value.id,
+          news_id, 
+          comment,
+        };
+    
+        const { data } = await apiClient.post("/comment", payload, {
+          headers: { Authorization: `Bearer ${token.value}` },
+        });
+    
+        showNotification("Komentar berhasil ditambahkan!");
+        return data.comment;
+      } catch (error) {
+        console.error("Gagal mengirim komentar:", error.response?.data);
+        showNotification(error.response?.data?.message || "Gagal mengirim komentar.");
+      }
+    }
     return {
       token,
       register,
@@ -165,5 +205,6 @@
       alertMessage,
       showNotification,
       profile,
+      uploadComment
      };
 });
