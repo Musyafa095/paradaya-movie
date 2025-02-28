@@ -109,8 +109,8 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useCategoryStore } from '@/stores/category';
-import { useNewsStore } from '@/stores/news';
+import { useCategoryStore } from '@/stores/genre';
+import { useNewsStore } from '@/stores/movie';
 
 
 // Store initialization

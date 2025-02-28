@@ -161,31 +161,36 @@
         currentUser.value = data.user;
         localStorage.setItem("profile", JSON.stringify(data.user));
         
-        showNotification("Profil berhasil diperbarui!");
+        showNotification("Profile berhasil diperbarui!");
       } catch (error) {
-        console.error("Gagal mengupdate profil:", error.response?.data);
-        showNotification(error.response?.data?.message || "Gagal mengupdate profil.");
+        console.error("Gagal mengupdate profile:", error.response?.data);
+        showNotification(error.response?.data?.message || "Gagal mengupdate profile.");
       }
     }    
-    async function uploadComment(news_id, comment) {
+    async function uploadReview(movie_id, comment, rating) {
       try {
         if (!currentUser.value) {
           showNotification("Anda harus login untuk mengirim komentar.");
           return;
         }
+        if (!token.value) {
+          showNotification("Token tidak ditemukan. Silakan login ulang.");
+          return;
+        }    
     
         const payload = {
           user_id: currentUser.value.id,
-          news_id, 
+          movie_id, 
           comment,
+          rating
         };
     
-        const { data } = await apiClient.post("/comment", payload, {
+        const { data } = await apiClient.post("/review", payload, {
           headers: { Authorization: `Bearer ${token.value}` },
         });
     
         showNotification("Komentar berhasil ditambahkan!");
-        return data.comment;
+        return data.review;
       } catch (error) {
         console.error("Gagal mengirim komentar:", error.response?.data);
         showNotification(error.response?.data?.message || "Gagal mengirim komentar.");
@@ -205,6 +210,6 @@
       alertMessage,
       showNotification,
       profile,
-      uploadComment
+      uploadReview
      };
 });

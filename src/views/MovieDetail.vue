@@ -171,7 +171,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
-import { useNewsStore } from '@/stores/news'
+import { useNewsStore } from '@/stores/movie'
 import { authStore } from '@/stores/auth'
 import Default from '@/layouts/Default.vue'
 

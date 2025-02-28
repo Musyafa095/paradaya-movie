@@ -168,8 +168,8 @@
 import { ref, onMounted, watch } from "vue";
 import { apiClient } from "@/config/api";
 import { authStore } from "@/stores/auth";
-import { useNewsStore } from "@/stores/news";
-import { useCategoryStore } from "@/stores/category";
+import { useNewsStore } from "@/stores/movie";
+import { useCategoryStore } from "@/stores/genre";
 
 
 const store = authStore();
