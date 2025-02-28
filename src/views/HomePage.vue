@@ -67,7 +67,7 @@ import { useCategoryStore } from "@/stores/category";
 import { useNewsStore } from "@/stores/news";
 import { useSearchStore } from "@/stores/search";
 import DefaultLayout from "@/layouts/Default.vue";
-import CardNews from "@/components/CardNews.vue";
+import CardMovie from "@/components/CardMovie.vue";
 
 const category = useCategoryStore();
 const searchStore = useSearchStore();
