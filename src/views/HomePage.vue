@@ -63,8 +63,8 @@
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { useCategoryStore } from "@/stores/category";
-import { useNewsStore } from "@/stores/news";
+import { useCategoryStore } from "@/stores/genre";
+import { useNewsStore } from "@/stores/movie";
 import { useSearchStore } from "@/stores/search";
 import DefaultLayout from "@/layouts/Default.vue";
 import CardMovie from "@/components/CardMovie.vue";
