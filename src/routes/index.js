@@ -26,14 +26,14 @@ const routes = [
         component: () => import("@/components/Admin/HomeDashboard.vue"),
       },
       {
-        path: "news",
-        name: "News",
-        component: () => import("@/components/Admin/News.vue"),
+        path: "movie",
+        name: "Movie",
+        component: () => import("@/components/Admin/Movie.vue"),
       },    
       {
-        path: "category",
-        name: "Category",
-        component: () => import("@/components/Admin/Category.vue"),
+        path: "genre",
+        name: "Genre",
+        component: () => import("@/components/Admin/Genre.vue"),
       },
       {
         path: "faq",
@@ -51,9 +51,9 @@ const routes = [
     },
   },
   {
-    path: "/news/:id",
-    component: () => import("@/views/NewsDetail.vue"),
-    name: "NewsDetail",
+    path: "/movie/:id",
+    component: () => import("@/views/MovieDetail.vue"),
+    name: "MovieDetail",
     meta: {
       layout: "Default",
       requiresAuth: true,
