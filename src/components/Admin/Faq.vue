@@ -63,16 +63,16 @@ export default {
           category: 'Umum',
           items: [
             {
-              question: 'Apa itu Portal Berita ParadayaNews.com?',
-              answer: 'Portal Berita ParadayaNews  adalah platform digital yang menyajikan berita terkini, akurat, dan terpercaya dalam berbagai kategori, seperti politik, ekonomi, teknologi, hiburan, dan olahraga. Dengan tampilan yang sederhana dan tentunya responsif, ParadayaNews dirancang untuk memberikan pengalaman membaca yang nyaman, baik dalam mode terang maupun gelap.Portal ini dikelola oleh tim admin yang bertugas untuk membuat, mengelola, dan mempublikasikan berita, sementara pengguna dapat membaca berita dan mengakses informasi dengan mudah. Dengan fokus pada kecepatan dan keterbacaan, Paradaya memastikan setiap berita disajikan dengan desain yang rapi, ringkas, dan informatif. 🚀'
+              question: 'Apa itu Portal Movie AnimeFlix?',
+              answer: 'Portal Movie AnimeFlix adalah platform berbasis web yang menyediakan informasi tentang berbagai film anime. Pengguna dapat menemukan detail film, genre, serta memberikan ulasan atau komentar.'
             },
             {
-              question: 'Bagaimana cara mengakses berita?',
-              answer: 'Anda dapat mengakses berita melalui halaman utama website ParadayaNews.com atau menggunakan menu kategori untuk menemukan berita berdasarkan topik yang Anda minati.'
+              question: 'Bagaimana cara mengakses AnimeFlix?',
+              answer: 'AnimeFlix dapat diakses melalui browser di perangkat apa pun yang terhubung ke internet. Cukup buka link web AnimeFlix dan login menggunakan akun yang sudah terdaftar.'
             },
             {
-              question: 'Apakah konten berita dapat diakses secara gratis?',
-              answer: 'Ya, semua konten berita kami dapat diakses secara gratis. Kami tidak memerlukan pembayaran untuk mengakses konten ini.'
+              question: 'Apakah konten Movie AnimeFlix dapat diakses secara gratis?',
+              answer: 'Ya, semua konten film kami dapat diakses secara gratis. Kami tidak memerlukan pembayaran untuk mengakses konten ini.'
             }
           ]
         },
@@ -94,14 +94,14 @@ export default {
           items: [
             {
               question: 'Berapa kali berita diperbarui?',
-              answer: 'Kami memperbarui berita secara real-time setiap hari. Berita terbaru akan muncul di halaman utama segera setelah dipublikasikan.'
+              answer: 'Kami memperbarui movie secara real-time setiap hari. Movie Anime terbaru akan muncul di halaman utama segera setelah dipublikasikan.'
             },
             {
-              question: 'Bagaimana cara mencari berita berdasarkan kategori?',
-              answer: 'Gunakan menu kategori di bagian atas atau header website untuk menjelajahi berita berdasarkan kategori yang Anda minati.'
+              question: 'Bagaimana cara mencari movie anime berdasarkan genre?',
+              answer: 'Gunakan menu genre di bagian atas atau header website untuk menjelajahi movie berdasarkan genre yang Anda minati.'
             },
             {
-              question: 'Apakah saya bisa menyimpan berita untuk dibaca nanti?',
+              question: 'Apakah saya bisa menyimpan movie anime untuk ditonton nanti?',
               answer: 'Belum, Mohon maaf kami belum menyediakan fitur bookmark untuk saat ini. kami akan kembangkan fitur ini nanti.'
             }
           ]
@@ -115,7 +115,7 @@ export default {
             },
             {
               question: 'Bagaimana jika saya mengalami masalah teknis?',
-              answer: 'Silakan hubungi tim support kami melalui email support@paradayaNews.com untuk mendapatkan bantuan teknis.'
+              answer: 'Silakan hubungi tim support kami melalui email support@AnimeFlix.com untuk mendapatkan bantuan teknis.'
             }
           ]
         }

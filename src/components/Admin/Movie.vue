@@ -1,35 +1,36 @@
 <template>
   <div class="container mx-auto px-4">
-    <h1 class="text-3xl font-semibold font-roboto text-center my-4">Halaman News 📰</h1>
+    <h1 class="text-3xl font-semibold font-roboto text-center my-4">Halaman Movie 🎬</h1>
 
     <!-- Form Section -->
     <section class="my-3" v-show="inputAction">
-      <h2 class="text-lg text-info font-bold">{{ isEdit ? "Edit" : "Tambah" }} News</h2>
-      <form @submit.prevent="actionNews" class="space-y-4 mt-2">
+      <h2 class="text-lg text-info font-bold">{{ isEdit ? "Edit" : "Tambah" }} Movie</h2>
+      <form @submit.prevent="actionMovie" class="space-y-4 mt-2">
         <input
           type="text"
-          placeholder="Masukan judul berita"
+          placeholder="Masukan judul movie"
           class="input input-bordered w-full"
-          v-model="newsData.title"
+          v-model="movieData.title"
           required
         />
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
-            type="date"
+            type="number"
+            placeholder="Tahun rilis"
             class="input input-bordered w-full"
-            v-model="newsData.date"
+            v-model="movieData.year"
             required
           />
           
           <select 
             class="select select-bordered w-full" 
-            v-model="newsData.category_id"
+            v-model="movieData.genre_id"
             required
           >
-            <option disabled value="">Select category</option>
+            <option disabled value="">Select genre</option>
             <option 
-              v-for="item in categoryList" 
+              v-for="item in genreList" 
               :key="item.id" 
               :value="item.id"
             >
@@ -38,10 +39,26 @@
           </select>
         </div>
 
+        <input
+          type="text"
+          placeholder="Link trailer (YouTube)"
+          class="input input-bordered w-full"
+          v-model="movieData.trailer_url"
+          required
+        />
+
+        <input
+          type="text"
+          placeholder="Link movie (Drive)"
+          class="input input-bordered w-full"
+          v-model="movieData.movie_url"
+          required
+        />
+
         <textarea
-          placeholder="Masukan konten berita"
+          placeholder="Masukan ringkasan film"
           class="textarea textarea-bordered w-full h-32"
-          v-model="newsData.content"
+          v-model="movieData.summary"
           required
         ></textarea>
         
@@ -55,8 +72,8 @@
             :required="!isEdit"
           />
           <img 
-            v-if="imagePreview" 
-            :src="imagePreview" 
+            v-if="posterPreview" 
+            :src="posterPreview" 
             alt="Preview" 
             class="w-32 h-32 object-cover rounded-lg"
           />
@@ -65,9 +82,9 @@
         <div class="flex gap-5">
           <button 
             class="btn btn-info flex-1"
-            :disabled="newsStore.isLoading"
+            :disabled="isLoading"
           >
-            <span v-if="newsStore.isLoading" class="loading loading-spinner loading-sm"></span>
+            <span v-if="isLoading" class="loading loading-spinner loading-sm"></span>
             {{ isEdit ? "Edit" : "Tambah" }}
           </button>
           <button
@@ -81,10 +98,10 @@
       </form>
     </section>
 
-    <!-- News List Section -->
+    <!-- Movie List Section -->
     <section>
       <div class="flex justify-between items-center my-5">
-        <h2 class="text-lg font-bold text-info">List News</h2>
+        <h2 class="text-lg font-bold text-info">List Movies</h2>
         <button
           @click="tambahForm"
           class="btn btn-success btn-sm px-4 py-2 rounded-xl"
@@ -94,117 +111,133 @@
       </div>
 
       <!-- Loading State -->
-      <div v-if="newsStore.isLoading" class="text-center py-8">
+      <div v-if="isLoading" class="text-center py-8">
         <span class="loading loading-spinner loading-lg"></span>
       </div>
       
       <!-- Error State -->
-      <div v-else-if="newsStore.error" class="alert alert-error">
-        {{ newsStore.error }}
+      <div v-else-if="error" class="alert alert-error">
+        {{ error }}
       </div>
 
-      <!-- News Grid -->
-     <!-- News Grid -->
-<div v-else>
-  <div v-if="newsStore.news.length === 0" class="text-center py-4">
-    No news available
-  </div>
-  
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-    <div 
-      v-for="(item, key) in newsStore.news" 
-      :key="item.id"
-      class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden ease-in-out hover:scale-105"
-    >
-      <figure class="px-4 pt-4">
-        <img 
-          :src="item.image" 
-          :alt="item.title"
-          class="rounded-xl h-48 w-full object-cover"
-        />
-      </figure>
-      <div class="card-body p-4 h-auto flex flex-col">
-        <h2 class="card-title text-base font-bold line-clamp-2">
-          {{ item.title }}
-        </h2>
-        <p class="text-sm light:text-gray-500">{{ item.date }}</p>
-        <p class="text-sm light:text-gray-700 line-clamp-3 font-montserrat ">
-          {{ item.content }}
-        </p>
-        <div class="card-actions justify-end mt-auto flex gap-2">
-          <button
-            class="btn btn-info btn-sm"
-            @click="handleEdit(item)"
-          >
-            Edit
-          </button>
-          <button
-            class="btn btn-secondary btn-sm"
-            @click="handleDelete(item.id)"
-          >
-            Delete
-          </button>
+      <!-- Movie Grid -->
+      <div v-else>
+        <div v-if="!movies || movies.length === 0" class="text-center py-4">
+          No movies available
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+          <div v-for="(item, key) in movies" :key="item?.id">
+            <div v-if="item" class="card bg-base-100 shadow-lg hover:shadow-xl transition-all">
+            <figure class="px-4 pt-4">
+              <img 
+                :src="item.poster" 
+                :alt="item.title"
+                class="rounded-xl h-48 w-full object-cover"
+              />
+            </figure>
+            <div class="card-body p-4 h-auto flex flex-col">
+              <h2 class="card-title text-base font-bold line-clamp-2">
+                {{ item.title }}
+              </h2>
+              <p class="text-sm light:text-gray-500">{{ item.year }}</p>
+              <p class="text-sm light:text-gray-700 line-clamp-3 font-montserrat">
+                {{ item.summary }}
+              </p>
+              <div class="card-actions justify-center mt-2 flex gap-2">
+                <button
+                  class="btn btn-info btn-sm"
+                  @click="handleEdit(item)"
+                >
+                  Edit
+                </button>
+                <button
+                  class="btn btn-secondary btn-sm"
+                  @click="handleDelete(item.id)"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
+      </div>
     </section>
     <div class="join flex justify-center items-center mt-4">
-  <button class="join-item btn btn-info"
-  @click="changePage(currentPage - 1)" 
-  :disabled="currentPage === 1"
-  >« Prev</button>
-  <button class="join-item btn">Halaman {{ currentPage }}{{ totalPages }}</button>
-  <button class="join-item btn btn-secondary"
-  @click="changePage(currentPage + 1)"
-  :disabled="currentPage === totalPages"
-  >Next »</button>
-</div>
+      <button 
+        class="join-item btn btn-info"
+        @click="changePage(currentPage - 1)" 
+        :disabled="currentPage === 1"
+      >
+        « Prev
+      </button>
+      <button class="join-item btn">Halaman {{ currentPage }} / {{ totalPages }}</button>
+      <button 
+        class="join-item btn btn-secondary"
+        @click="changePage(currentPage + 1)"
+        :disabled="currentPage === totalPages"
+      >
+        Next »
+      </button>
+    </div>
   </div>
 </template>
-
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { apiClient } from "@/config/api";
 import { authStore } from "@/stores/auth";
-import { useNewsStore } from "@/stores/movie";
-import { useCategoryStore } from "@/stores/genre";
-
+import { useMovieStore } from "@/stores/movie";
+import { useGenreStore } from "@/stores/genre";
 
 const store = authStore();
-const newsStore = useNewsStore();
-const categoryStore = useCategoryStore();
-const categoryList = ref([]);
+const movieStore = useMovieStore();
+const genreStore = useGenreStore();
+const genreList = ref([]);
 const fileInput = ref(null);
-const imagePreview = ref(null);
+const posterPreview = ref(null);
 const currentPage = ref(1);
+const isLoading = ref(false);
+const error = ref(null);
+const movies = ref([]);
+const totalPages = ref(1);
 
-const newsData = ref({
+const movieData = ref({
   title: "",
-  date: "",
-  content: "",
-  image: null,
-  category_id: ""
+  year: "",
+  summary: "",
+  poster: null,
+  trailer_url: "",
+  movie_url: "",
+  genre_id: ""
 });
 const inputAction = ref(false);
 const isEdit = ref(false);
 const id = ref(null);
 
-const fetchNews = async () => {
+const fetchMovie = async () => {
+  isLoading.value = true;
+  error.value = null;
   try {
-    await newsStore.getNews(currentPage.value);
-  } catch (error) {
-    console.error("Error fetching news:", error);
-    alert("Failed to fetch news. Please try again later.");
+    await movieStore.getMovie(currentPage.value); // Ambil data dari store
+    movies.value = movieStore.movie; // Sinkronkan dengan data di store
+    totalPages.value = movieStore.totalPages; // Gunakan total halaman dari store
+  } catch (err) {
+    console.error("Error fetching movies:", err);
+    error.value = "Failed to fetch movies.";
+    movies.value = [];
+  } finally {
+    isLoading.value = false;
   }
 };
 
-const fetchCategories = async () => {
+
+const fetchGenres = async () => {
   try {
-    categoryList.value = await categoryStore.getCategory();
+    await genreStore.getGenre(); // Ambil data genre dari store
+    genreList.value = genreStore.genre; // Sinkronkan dengan data di store
   } catch (error) {
-    console.error("Error fetching categories:", error);
+    console.error("Error fetching genres:", error);
     store.showNotification("Gagal memuat kategori, silahkan coba lagi.");
   }
 };
@@ -212,26 +245,28 @@ const fetchCategories = async () => {
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
   if (file && file.type.startsWith('image/')) {
-    newsData.value.image = file;
-    imagePreview.value = URL.createObjectURL(file);
+    movieData.value.poster = file;
+    posterPreview.value = URL.createObjectURL(file);
   } else {
-    alert("File harus berupa gambar.");
-    newsData.value.image = null;
-    imagePreview.value = null;
+    alert("File harus berupa gambar poster.");
+    movieData.value.poster = null;
+    posterPreview.value = null;
   }
 };
 
 const clearInputForm = () => {
-  newsData.value = {
+  movieData.value = {
     title: "",
-    date: "",
-    content: "",
-    image: null,
-    category_id: ""
+    year: "",
+    summary: "",
+    trailer_url: "",
+    movie_url: "",
+    poster: null,
+    genre_id: ""
   };
   isEdit.value = false;
   id.value = null;
-  imagePreview.value = null;
+  posterPreview.value = null;
   if (fileInput.value) {
     fileInput.value.value = '';
   }
@@ -251,45 +286,50 @@ const handleEdit = (item) => {
   inputAction.value = true;
   isEdit.value = true;
   id.value = item.id;
-  newsData.value = {
+  movieData.value = {
     title: item.title,
-    date: item.date,
-    content: item.content,
-    image: null,
-    category_id: item.category_id
+    year: item.year,
+    summary: item.summary,
+    trailer_url: item.trailer_url,
+    movie_url: item.movie_url,
+    poster: null,
+    genre_id: item.genre_id
   };
-  imagePreview.value = item.image;
-  fetchCategories(); // Refresh categories when editing
+  posterPreview.value = item.poster;
+  fetchGenres(); 
 };
 
 const handleDelete = async (itemId) => {
-  if (!confirm("Apakah anda yakin ingin menghapus berita ini?")) return;
+  if (!confirm("Apakah anda yakin ingin menghapus movie ini?")) return;
   try {
-    await apiClient.delete(`/news/${itemId}`, {
+    await apiClient.delete(`/movie/${itemId}`, {
       headers: { Authorization: `Bearer ${store.token}` },
     });
-    store.showNotification("Berita berhasil dihapus.");
-    await fetchNews();
+    store.showNotification("Movie berhasil dihapus.");
+    await fetchMovie();
   } catch (error) {
-    console.error("Error deleting news:", error);
-    store.showNotification("Gagal menghapus berita, silahkan coba lagi.");
+    console.error("Error deleting movie:", error);
+    store.showNotification("Gagal menghapus movie, silahkan coba lagi.");
   }
 };
 
-const actionNews = async () => {
+const actionMovie = async () => {
+  isLoading.value = true;
   try {
     const formData = new FormData();
-    formData.append('title', newsData.value.title);
-    formData.append('date', newsData.value.date);
-    formData.append('content', newsData.value.content);
-    formData.append('category_id', newsData.value.category_id);
-    if (newsData.value.image instanceof File) {
-      formData.append('image', newsData.value.image);
+    formData.append('title', movieData.value.title);
+    formData.append('year', movieData.value.year);
+    formData.append('summary', movieData.value.summary);
+    formData.append('trailer_url', movieData.value.trailer_url);
+    formData.append('movie_url', movieData.value.movie_url);
+    formData.append('genre_id', movieData.value.genre_id);
+    if (movieData.value.poster instanceof File) {
+      formData.append('poster', movieData.value.poster);
     }
 
     if (isEdit.value) {
       await apiClient.post(
-        `/news/${id.value}?_method=PUT`,
+        `/movie/${id.value}?_method=PUT`,
         formData,
         {
           headers: { 
@@ -298,10 +338,10 @@ const actionNews = async () => {
           },
         }
       );
-      store.showNotification("Berita berhasil diupdate.");
+      store.showNotification("Movie berhasil diupdate.");
     } else {
       await apiClient.post(
-        "/news",
+        "/movie",
         formData,
         {
           headers: { 
@@ -310,10 +350,10 @@ const actionNews = async () => {
           },
         }
       );
-      store.showNotification("Berita berhasil dibuat.");
+      store.showNotification("Movie berhasil dibuat.");
     }
 
-    await fetchNews();
+    await fetchMovie();
     closeForm();
   } catch (error) {
     if (error.response) {
@@ -321,20 +361,23 @@ const actionNews = async () => {
       alert(error.response.data.message || "An error occurred.");
     } else {
       console.error("Error:", error);
-      store.showNotification("Gagal menyimpan berita, silahkan coba lagi.");
+      store.showNotification("Gagal menyimpan movie, silahkan coba lagi.");
     }
+  } finally {
+    isLoading.value = false;
   }
 };
-const changePage = (page) => {
-  if (page >= 1 && page <= newsStore.totalPages) {
-    currentPage.value = page;
-    fetchNews();
-  }
-};
-watch (currentPage, fetchNews);
 
+const changePage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+    fetchMovie();
+  }
+};
+
+watch(currentPage, fetchMovie);
 
 onMounted(async () => {
-  await Promise.all([fetchNews(), fetchCategories()]);
+  await Promise.all([fetchMovie(), fetchGenres()]);
 });
 </script>

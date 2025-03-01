@@ -7,8 +7,8 @@
           Selamat Datang Kembali!
         </h1>
         <p class="text-gray-700 text-lg leading-relaxed font-roboto">
-          Silakan masuk ke akun Anda untuk mengakses semua berita  terbaru dan 
-          layanan eksklusif. Tetap terhubung dengan informasi terkini hanya ParadayaNews.
+          Silakan masuk ke akun Anda untuk mengakses semua Movie Anime terbaru dan 
+          layanan eksklusif. Tetap terhubung dengan informasi terkini hanya di AnimeFlix.
         </p>
         <!-- Gradient Button untuk Text Section -->
       </div>

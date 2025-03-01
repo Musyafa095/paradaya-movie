@@ -179,23 +179,27 @@
         }    
     
         const payload = {
-          user_id: currentUser.value.id,
           movie_id, 
           comment,
-          rating
+          rating: parseFloat(rating) // Pastikan rating dikirim sebagai decimal
         };
     
         const { data } = await apiClient.post("/review", payload, {
           headers: { Authorization: `Bearer ${token.value}` },
         });
     
+        if (!data || !data.data) { // Perbaikan: Ambil `data.data`, bukan `data.review`
+          throw new Error("Data review tidak ditemukan dalam respons API.");
+        }
+    
         showNotification("Komentar berhasil ditambahkan!");
-        return data.review;
+        return data.data; // Perbaikan: Kembalikan `data.data`
       } catch (error) {
-        console.error("Gagal mengirim komentar:", error.response?.data);
+        console.error("Gagal mengirim komentar:", error.response?.data || error.message);
         showNotification(error.response?.data?.message || "Gagal mengirim komentar.");
       }
     }
+    
     return {
       token,
       register,

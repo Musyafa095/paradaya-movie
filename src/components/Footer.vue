@@ -5,7 +5,7 @@
       <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-8">
         <!-- Categories -->
         <div class="footer-section">
-          <h3 class="font-bold mb-4 text-lg">Berita</h3>
+          <h3 class="font-bold mb-4 text-lg">Movie</h3>
           <ul class="space-y-2">
             <li v-for="category in categories" :key="category">
               {{ category }}
@@ -43,7 +43,7 @@
             {{ link }}
           </a>
         </div>
-        <div class="text-sm">© {{ currentYear }} paradayaNews.com. Seluruh hak cipta dilindungi.</div>
+        <div class="text-sm">© {{ currentYear }} AnimeFlix.com. Seluruh hak cipta dilindungi.</div>
         <div class="flex space-x-4 mt-4 md:mt-0">
           <a href="#" class="text-gray-400 hover:text-white">
             <i class="fab fa-facebook text-xl"></i>

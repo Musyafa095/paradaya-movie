@@ -1,7 +1,8 @@
 <template>
   <div class="navbar bg-base-100">
-    <div class="flex-1 text-4xl font-bold bg-gradient-to-r from-red-600 via-purple-800 to-blue-700 text-transparent bg-clip-text">
-      <a href="/" class="btn btn-ghost text-xl">ParadayaNews.com</a>
+    <div class="flex-1 text-4xl font-bold font-montserrat bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-300
+ text-transparent bg-clip-text">
+      <a href="/" class="btn btn-ghost text-xl">AnimeFlix.com</a>
     </div>
 
     <div class="flex-none gap-2">
@@ -14,7 +15,7 @@
           type="text"
           v-model="searchStore.searchQuery"
           class="ml-2 w-full focus:outline-none bg-transparent"
-          placeholder="Cari Berita Disini..."
+          placeholder="Cari Movie Anime Disini..."
         />
       </div>
 
@@ -69,8 +70,9 @@
       </label>
 
       <!-- Profile dropdown -->
-      <div class="dropdown dropdown-end">
-        <label tabindex="0" class="btn btn-ghost btn-circle avatar" @click="isOpen = !isOpen">
+      <div class="dropdown dropdown-end" >
+        <label tabindex="0" class="btn btn-ghost btn-circle avatar"
+        @click="isOpen = !isOpen">
           <div class="w-10 rounded-full">
             <img
               v-if="user?.profile?.image"
@@ -84,10 +86,11 @@
             />
           </div>
         </label>
-        <ul
-          v-if="isOpen"
-          tabindex="0"
-          class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 font-bold"
+        <ul         
+          v-if="isOpen"  
+          tabindex="0"    
+          class="menu menu-sm dropdown-content mt-3 z-[100] p-2 shadow bg-base-100 rounded-box w-52 font-bold"
+          @click.outside="isProfileDropdownOpen = false"
         >
           <li v-if="user">
             <RouterLink :to="`/profile/${user.id}`" class="justify-between">
@@ -112,22 +115,19 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted} from 'vue';
 import { useRouter, RouterLink } from 'vue-router';
 import { useSearchStore } from '@/stores/search';
 import { useThemeStore } from '@/stores/themeStore';
 import { authStore } from '@/stores/auth';
 
 const router = useRouter();
-const isOpen = ref(false);
 const auth = authStore();
 const user = computed(() => auth.currentUser);
 const ThemeStore = useThemeStore();
 const searchStore = useSearchStore();
 const isMobileSearchOpen = ref(false);
-
-
-
+const isOpen = ref(false);  
 
 const toggleSearch = () => {
   isMobileSearchOpen.value = !isMobileSearchOpen.value;
@@ -151,4 +151,28 @@ const handleLogout = async () => {
     console.error('Logout failed:', error);
   }
 };
+const handleClickOutside = (event) => {
+  if (!event.target.closest(".dropdown-content") && !event.target.closest(".avatar")) {
+    isOpen.value = false;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener("click", handleClickOutside);
+});
+
 </script>
+
+<style>
+/* Pastikan dropdown selalu di atas konten lainnya */
+.dropdown-content {
+  z-index: 100 !important;
+}
+
+/* Tambahkan style untuk memperbaiki interaksi dropdown */
+.dropdown:focus-within .dropdown-content {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+</style>
