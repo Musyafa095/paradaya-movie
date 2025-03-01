@@ -69,10 +69,10 @@
       <!-- Logo/Brand -->
       <div class="p-4 mb-6">
         <h2 :class="[
-          'font-bold transition-all duration-300',
+          'font-bold transition-all duration-300 bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent',
           isCollapsed ? 'text-lg text-center' : 'text-2xl'
         ]">
-          {{ isCollapsed ? 'PD' : 'Dashboard ParadayaNews.com' }}
+          {{ isCollapsed ? 'AF' : 'AnimeFlix.com' }}
         </h2>
       </div>
 
@@ -98,7 +98,7 @@
           </router-link>
         </li>
         <li>
-          <router-link to="/dashboard/news">
+          <router-link to="/dashboard/movie">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-5 w-5"
@@ -110,14 +110,14 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2"
+                d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"
               />
             </svg>    
-            <span :class="{ 'hidden': isCollapsed }">News</span>
+            <span :class="{ 'hidden': isCollapsed }">Movie</span>
           </router-link>
         </li>
         <li>
-          <router-link to="/dashboard/category">
+          <router-link to="/dashboard/genre">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-5 w-5"
@@ -129,10 +129,10 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
               />
             </svg>
-            <span :class="{ 'hidden': isCollapsed }">Category</span>
+            <span :class="{ 'hidden': isCollapsed }">Genre</span>
           </router-link>
         </li>
       </ul>

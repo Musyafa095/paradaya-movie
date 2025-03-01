@@ -44,6 +44,7 @@ const routes = [
   },  
   {
     path: "/profile/:id",
+    name: "Profile",
     component: () => import("@/views/Profile.vue"),
     meta: {
       layout: "Default",
@@ -61,6 +62,7 @@ const routes = [
   },
   {
     path: "/login",
+    name: "Login",
     component: () => import("@/views/Login.vue"),
     meta: {
       guestOnly: true 
@@ -68,6 +70,7 @@ const routes = [
   },
   {
     path: "/register",
+    name: "Register",
     component: () => import("@/views/Register.vue"),
     meta: {
       guestOnly: true

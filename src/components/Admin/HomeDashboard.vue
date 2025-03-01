@@ -3,7 +3,7 @@
     <!-- Header Section -->
     <header class="mb-8">
       <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold font-montserrat light:text-gray-900">ParadayaNews.com 🚀</h1>
+        <h1 class="text-3xl font-bold font-montserrat light:text-gray-900">AnimeFlix.com 🚀</h1>
         <div class="font-roboto text-gray-600 ">
           {{ currentTime }} WIB 🫠 
         </div>
@@ -12,42 +12,42 @@
       <!-- Statistics Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div class=" bg-white p-4 rounded-lg shadow-lg">
-          <h3 class="text-lg font-semibold text-gray-700">Total Berita 📰</h3>
-          <p class="text-2xl font-bold text-blue-600">{{ totalNewsCount }}</p>
+          <h3 class="text-lg font-semibold text-gray-700">Total Movie 🎥</h3>
+          <p class="text-2xl font-bold text-blue-600">{{ totalMovieCount }}</p>
         </div>
         <div class="bg-white p-4 rounded-lg shadow-lg">
-          <h3 class="text-lg font-semibold text-gray-700">Jumlah Kategori 📝 </h3>
-          <p class="text-2xl font-bold text-green-600">{{ totalCategories }}</p>
+          <h3 class="text-lg font-semibold text-gray-700">Jumlah Genre 🎬 </h3>
+          <p class="text-2xl font-bold text-green-600">{{ totalGenres }}</p>
         </div>
         <div class="bg-white p-4 rounded-lg shadow-lg">
-          <h3 class="text-lg font-semibold text-gray-700">Terakhir Update Berita 📚</h3>
-          <p class=" text-slate-600">{{ latestNewsUpdate }}</p>
+          <h3 class="text-lg font-semibold text-gray-700">Terakhir Update Movie 💾</h3>
+          <p class=" text-slate-600">{{ latestMovieUpdate }}</p>
         </div>
       </div>  
     </header>
 
     <!-- Categories Section -->
     <section class="mb-8">
-      <h2 class="text-2xl font-semibold mb-4">Categories</h2>
+      <h2 class="text-2xl font-semibold mb-4">Genres</h2>
       <div class="flex flex-wrap gap-2">
         <button
-          @click="fetchNewsByCategory(null)"
+          @click="fetchMovieByGenre(null)"
           :class="[
             'px-4 py-2 rounded-full text-sm font-medium transition-colors',
-            !selectedCategory 
+            !selectedGenre
               ? 'bg-blue-600 text-white' 
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
           ]"
         >
-          All News
+          All Movie
         </button>
         <button
-          v-for="cat in category"
+          v-for="cat in genre"
           :key="cat.id"
-          @click="fetchNewsByCategory(cat.id)"
+          @click="fetchMovieByGenre(cat.id)"
           :class="[
             'px-4 py-2 rounded-full text-sm font-medium transition-colors',
-            selectedCategory === cat.id 
+            selectedGenre === cat.id 
               ? 'bg-blue-600 text-white' 
               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
           ]"
@@ -57,9 +57,9 @@
       </div>
     </section>
 
-    <!-- News Grid -->
+    <!-- Movie Grid -->
     <section>
-      <h2 class="text-2xl font-semibold mb-4">Latest News</h2>
+      <h2 class="text-2xl font-semibold mb-4">Latest MOvie</h2>
       
       <!-- Loading State -->
       <div v-if="isLoading" class="flex justify-center items-center py-12">
@@ -72,22 +72,22 @@
       </div>
 
       <!-- News Grid -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-  <div v-for="news in newsItems" :key="news.id" class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden ease-in-out hover:scale-105">
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+  <div v-for="movie in movieItems" :key="movie.id" class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden ease-in-out hover:scale-105">
     <img 
-      :src="news.image || 'placeholder-image.jpg'" 
-      :alt="news.title"
+      :src="movie.poster || 'placeholder-image.jpg'" 
+      :alt="movie.title"
       class="w-full h-40 sm:h-48 object-cover"
     >
     <div class="card-body p-4 sm:p-5">
       <div class="text-xs light:text-gray-900 mb-2 uppercase tracking-wide">  
-        {{ formatDate(news.created_at) }}
+        {{ formatDate(movie.created_at) }}
       </div>
       <h3 class="card-title text-base sm:text-lg font-semibold light:text-gray-800 mb-2 sm:mb-3 line-clamp-2 hover:text-blue-600 transition-colors">
-        {{ news.title }}
+        {{ movie.title }}
       </h3>
       <p class="text-sm light:text-gray-600 mb-3 sm:mb-4  font-montserrat line-clamp-3">
-        {{ news.content }}
+        {{ movie.summary }}
       </p>
          </div>
       </div>
@@ -109,23 +109,23 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useCategoryStore } from '@/stores/genre';
-import { useNewsStore } from '@/stores/movie';
+import { useGenreStore } from '@/stores/genre';
+import { useMovieStore } from '@/stores/movie';
 
 
 // Store initialization
-const categoryStore = useCategoryStore();
-const newsStore = useNewsStore();
+const genreStore = useGenreStore();
+const movieStore = useMovieStore();
 
 // Use storeToRefs to maintain reactivity
-const { category } = storeToRefs(categoryStore);
-const { news, isLoading, error, totalPages, totalNewsCount} = storeToRefs(newsStore);
+const { genre } = storeToRefs(genreStore);
+const { movie, isLoading, error, totalPages, totalMovieCount} = storeToRefs(movieStore);
 const currentPage = ref(1);
 // Local state
 const currentTime = ref('');
-const selectedCategory = ref(null);
-const newsItems = computed(() => news.value || []);
-const totalCategories = computed(() => category.value?.length || 0);
+const selectedGenre = ref(null);
+const movieItems = computed(() => movie.value || []);
+const totalGenres = computed(() => genre.value?.length || 0);
 
 
 const hariIndonesia = {
@@ -157,12 +157,12 @@ const bulanIndonesia = {
 // Computed properties
 
 
-const latestNewsUpdate = computed(() => {
-  if (newsItems.value && newsItems.value.length > 0) {
-    const sortedNews = [...newsItems.value].sort((a, b) => 
+const latestMovieUpdate = computed(() => {
+  if (movieItems.value && movieItems.value.length > 0) {
+    const sortedMovie = [...movieItems.value].sort((a, b) => 
       new Date(b.created_at) - new Date(a.created_at)
     );
-    return formatDate(sortedNews[0].created_at);
+    return formatDate(sortedMovie[0].created_at);
   }
   return 'Belum ada update';
 });
@@ -190,12 +190,12 @@ const formatDate = (date) => {
   return `${day}, ${d.getDate()} ${month} ${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 };
 // Fungsi mengambil berita berdasarkan kategori
-const fetchNewsByCategory = async (categoryId, page = 1) => {
-  selectedCategory.value = categoryId;
+const fetchMovieByGenre = async (genreId, page = 1) => {
+  selectedGenre.value = genreId;
   try { 
-    await newsStore.getNews(page, categoryId);
+    await movieStore.getMovie(page, genreId);
   } catch (err) {
-    console.error("Error fetching news:", err);
+    console.error("Error fetching movies:", err);
   }
 };
 
@@ -203,7 +203,7 @@ const fetchNewsByCategory = async (categoryId, page = 1) => {
 const changePage = (page) => {
   if (page >= 1 && page <= totalPages.value) {  
     currentPage.value = page;
-    fetchNewsByCategory(selectedCategory.value, page);
+    fetchMovieByGenre(selectedGenre.value, page);
   }
 };
 
@@ -214,14 +214,14 @@ onMounted(async () => {
   setInterval(updateTime, 1000);       
   try {
     await Promise.all([
-      categoryStore.getCategory(),
-      newsStore.getNews(currentPage.value)  
+      genreStore.getGenre(),
+      movieStore.getMovie(currentPage.value)  
     ]);
   } catch (err) {
     console.error("Error saat memuat data:", err);
   }
 });
 watch (currentPage, (newPage) => {
-  fetchNewsByCategory(selectedCategory.value, newPage);
+  fetchMovieByGenre(selectedGenre.value, newPage);
 });
 </script>
