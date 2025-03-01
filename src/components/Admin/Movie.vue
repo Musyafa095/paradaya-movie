@@ -101,7 +101,7 @@
     <!-- Movie List Section -->
     <section>
       <div class="flex justify-between items-center my-5">
-        <h2 class="text-lg font-bold text-info">List Movies</h2>
+        <h2 class="text-lg font-bold text-cyan-500">List Movies</h2>
         <button
           @click="tambahForm"
           class="btn btn-success btn-sm px-4 py-2 rounded-xl"
