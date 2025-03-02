@@ -3,7 +3,7 @@
     <!-- Header Section -->
     <header class="mb-8">
       <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold font-montserrat light:text-gray-900">AnimeFlix.com 🚀</h1>
+        <h1 class="text-3xl font-bold font-sans light:text-gray-900">AnimeFlix.com 🚀</h1>
         <div class="font-roboto text-gray-600 ">
           {{ currentTime }} WIB 🫠 
         </div>

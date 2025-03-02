@@ -26,7 +26,7 @@
     </section>
     <section>
       <div class="flex justify-between items-center my-5">
-        <h2 class="text-lg font-bold font-roboto">List Genre</h2>
+        <h2 class="text-lg font-bold font-roboto text-cyan-500">List Genre</h2>
         <button
           @click="tambahForm"
           class="btn btn-success btn-sm px-4 py-2 rounded-xl"
@@ -75,7 +75,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { apiClient } from "@/config/api";
-import { authStore } from "@/stores/auth";
+import { authStore } from "@/stores/auth";          
 
 // State Management
 const store = authStore();
@@ -128,7 +128,7 @@ const handleDelete = async (itemId) => {
       }
     });
     store.showNotification("Berhasil menghapus genre.");
-    await fetchCategory();
+    await fetchGenre();
   } catch (error) {
     console.error("Error deleting genre:", error);
     store.showNotification("Gagal menghapus genre, silahkan coba lagi.");

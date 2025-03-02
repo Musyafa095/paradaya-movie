@@ -80,7 +80,10 @@
         <div class="max-w-xl mx-auto px-4 md:px-6 lg:px-8">
           <h2 class="text-3xl font-bold mb-4">Anime Terbaru</h2>
           <p class="mb-5 text-lg">Streaming anime terbaik di indonesia. Temukan koleksi terlengkap hanya di AnimeFlix🍿.</p>
-          <button class="btn btn-info"> 🚀 Tonton Sekarang!</button>
+          <button @click="scrollToTop" class="btn btn-info">
+             🚀 Tonton Sekarang!
+          </button>
+
         </div>
       </div>
     </div>
@@ -182,6 +185,13 @@ const changePage = (page) => {
     fetchMovies();
   }
 };
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth' // Biar smooth saat scroll ke atas
+  });
+};
+
 
 watch(currentPage, fetchMovies);
 
