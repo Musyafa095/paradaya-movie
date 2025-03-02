@@ -9,7 +9,7 @@
           <input 
             type="text" 
             v-model="searchQuery" 
-            placeholder="Cari pertanyaan..." 
+            placeholder="Cari pertanyaan seputar animeflix..." 
             class="input input-bordered w-full bg-base-100 border-2 transition-all duration-300 shadow-sm
             hover:border-primary focus:border-primary focus:shadow-md focus:outline-none
             dark:bg-base-200 dark:border-base-300 dark:hover:border-primary"
@@ -84,8 +84,8 @@ export default {
               answer: 'Klik tombol "Login" di pojok kanan atas, isi formulir pendaftaran dengan data diri Anda, dan ikuti petunjuk verifikasi email yang akan dikirimkan.'
             },
             {
-              question: 'Bagaimana cara mengupdate profil?',
-              answer: 'Masuk ke navbar profil, klik menu "Profil", Isi bio, umur dan pilih foto. lalu klik tombol "Simpan" untuk menyimpan perubahan.'
+              question: 'Bagaimana cara mengupdate profile?',
+              answer: 'Masuk ke navbar profil, klik menu "Profile", Isi bio, umur dan pilih foto. lalu klik tombol "Simpan" untuk menyimpan perubahan.'
             }
           ]
         },
@@ -93,7 +93,7 @@ export default {
           category: 'Konten & Kategori',
           items: [
             {
-              question: 'Berapa kali berita diperbarui?',
+              question: 'Berapa kali animeflix diperbarui?',
               answer: 'Kami memperbarui movie secara real-time setiap hari. Movie Anime terbaru akan muncul di halaman utama segera setelah dipublikasikan.'
             },
             {
@@ -115,7 +115,7 @@ export default {
             },
             {
               question: 'Bagaimana jika saya mengalami masalah teknis?',
-              answer: 'Silakan hubungi tim support kami melalui email support@AnimeFlix.com untuk mendapatkan bantuan teknis.'
+              answer: 'Silakan hubungi tim support kami melalui email support@AnimeFlix.com yang tertera di footer website untuk mendapatkan bantuan teknis.'
             }
           ]
         }
