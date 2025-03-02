@@ -2,6 +2,7 @@
   import { defineStore } from "pinia";
   import { useRouter } from "vue-router";
   import { apiClient } from "@/config/api";
+  import { onMounted } from "vue";
 
   export const authStore = defineStore("auth", () => {
     const router = useRouter();
@@ -103,22 +104,25 @@
         showNotification("Gagal logout, silakan coba lagi.");
       }
     }
-
     async function getUserLogged() {
       try {
         const { data } = await apiClient.get("/auth/me", {
           headers: { Authorization: `Bearer ${token.value}` },
         });
-
+    
         currentUser.value = data.user;
         localStorage.setItem("user", JSON.stringify(data.user));
-
+    
         return data.user;
       } catch (error) {
-        console.error(error.message);
-        showNotification("Gagal mengambil data pengguna.");
+        console.error("Token invalid atau sesi habis, menghapus data user.");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("profile");
+        token.value = null;
+        currentUser.value = null;
       }
-    }
+    }    
 
     async function verifyAccount(otp) {
       try {
@@ -199,6 +203,12 @@
         showNotification(error.response?.data?.message || "Gagal mengirim komentar.");
       }
     }
+    
+
+onMounted(async () => {
+  await getUserLogged();
+});
+
     
     return {
       token,
