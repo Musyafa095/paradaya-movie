@@ -78,8 +78,8 @@
       
       <div class="hero-content text-left text-white z-20 absolute top-0 left-0 w-full h-full flex items-center">
         <div class="max-w-xl mx-auto px-4 md:px-6 lg:px-8">
-          <h2 class="text-3xl font-bold mb-4">Anime Terbaru</h2>
-          <p class="mb-5 text-lg">Streaming anime terbaik di indonesia. Temukan koleksi terlengkap hanya di AnimeFlix🍿.</p>
+          <h2 class="text-3xl font-bold mb-4 font-roboto">Anime Terbaru</h2>
+          <p class="mb-5 text-lg font-bold">Streaming anime terbaik di indonesia. Temukan koleksi terlengkap hanya di AnimeFlix🍿.</p>
           <button @click="scrollToTop" class="btn btn-info">
              🚀 Tonton Sekarang!
           </button>
