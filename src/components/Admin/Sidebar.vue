@@ -69,10 +69,10 @@
       <!-- Logo/Brand -->
       <div class="p-4 mb-6">
         <h2 :class="[
-          'font-bold transition-all duration-300 bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 font-sans bg-clip-text text-transparent',
+          'font-bold transition-all duration-300 bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-500 font-monserrat bg-clip-text text-transparent',
           isCollapsed ? 'text-lg text-center' : 'text-2xl'
         ]">
-          {{ isCollapsed ? 'AF' : 'AnimeFlix.com' }}
+          {{ isCollapsed ? 'AF' : 'AnimeFlix' }}
         </h2>
       </div>
 
