@@ -2,7 +2,7 @@
   <div class="navbar bg-base-100">
     <div class="flex-1 text-4xl font-bold font-montserrat bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-300
  text-transparent bg-clip-text">
-      <a href="/" class="btn btn-ghost text-xl">AnimeFlix.com</a>
+      <a href="/" class="btn btn-ghost text-xl font-monserrat">AnimeFlix.com</a>
     </div>
 
     <div class="flex-none gap-2">
