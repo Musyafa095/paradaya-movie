@@ -1,10 +1,10 @@
 <template>
   <div class="container mx-auto px-4 py-6">
     <!-- Header Section -->
-    <header class="mb-8">
-      <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold font-sans light:text-gray-900">AnimeFlix.com 🚀</h1>
-        <div class="font-roboto text-gray-600 ">
+    <header class="mb-6">
+      <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+        <h1 class="text-3xl font-bold font-roboto light:text-gray-900">AnimeFlix Dashboard 🚀</h1>
+        <div class="font-roboto text-gray-600 mb-4 ">
           {{ currentTime }} WIB 🫠 
         </div>
       </div>
@@ -27,7 +27,7 @@
     </header>
 
     <!-- Categories Section -->
-    <section class="mb-8">
+    <section class="mb-4">
       <h2 class="text-2xl font-semibold mb-4">Genres</h2>
       <div class="flex flex-wrap gap-2">
         <button
@@ -59,7 +59,7 @@
 
     <!-- Movie Grid -->
     <section>
-      <h2 class="text-2xl font-semibold mb-4">Latest MOvie</h2>
+      <h2 class="text-2xl font-semibold mb-4">Latest Movie</h2>
       
       <!-- Loading State -->
       <div v-if="isLoading" class="flex justify-center items-center py-12">
