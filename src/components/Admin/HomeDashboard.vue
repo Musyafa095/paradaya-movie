@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto px-4 py-6">
     <!-- Header Section -->
-    <header class="mb-6">
+    <header class="mb-4">
       <div class="flex flex-col md:flex-row justify-between items-center mb-4">
         <h1 class="text-3xl font-bold font-roboto light:text-gray-900">AnimeFlix Dashboard 🚀</h1>
         <div class="font-roboto text-gray-600 mb-4 ">
@@ -10,7 +10,7 @@
       </div>
       
       <!-- Statistics Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div class=" bg-white p-4 rounded-lg shadow-lg">
           <h3 class="text-lg font-semibold text-gray-700">Total Movie 🎥</h3>
           <p class="text-2xl font-bold text-blue-600">{{ totalMovieCount }}</p>
@@ -28,7 +28,7 @@
 
     <!-- Categories Section -->
     <section class="mb-4">
-      <h2 class="text-2xl font-semibold mb-4">Genres</h2>
+      <h2 class="text-2xl font-semibold mb-2">Genres</h2>
       <div class="flex flex-wrap gap-2">
         <button
           @click="fetchMovieByGenre(null)"
